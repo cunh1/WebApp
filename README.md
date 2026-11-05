@@ -1,73 +1,17 @@
-# WebApp Seiren ‚Äî Sistema de gerenciamento de chamados
+# WebApp Seiren ó Sistema de gerenciamento de chamados
 
-Aplica√ß√£o existente em HTML/CSS/JavaScript, com backend Node.js + Express e banco SQLite (`better-sqlite3`). O servidor local serve a API e o frontend na mesma origem.
+O projeto mantÈm o frontend HTML/CSS/JavaScript, backend Node.js + Express e SQLite (`better-sqlite3`). Localmente, `cd server; npm ci; npm start` continua servindo frontend e API na mesma origem.
 
-## Requisitos
+## Deploy de teste na Vercel
 
-- Node.js 22 ou superior
-- npm
-- Em plataformas compat√≠veis, ferramentas de compila√ß√£o necess√°rias para instalar `better-sqlite3` caso n√£o haja bin√°rio pr√©-compilado para o ambiente
+A raiz do repositÛrio È o diretÛrio do projeto Vercel. A Function `api/index.js` importa a aplicaÁ„o Express sem abrir uma porta, executa as migrations e responde ‡s rotas existentes; `vercel.json` encaminha as requisiÁıes para ela e inclui frontend e migrations no pacote.
 
-## Executar localmente
+Configure Node.js 22 no projeto e implante a partir da raiz. N„o configure `DB_PATH` ou `UPLOADS_PATH` para diretÛrios do bundle: na Vercel os padrıes usam `/tmp/webapp-seiren`, grav·vel durante a execuÁ„o.
 
-1. Abra um terminal na pasta `server`.
-2. Instale as depend√™ncias:
-   ```bash
-   npm ci
-   ```
-3. Copie `.env.example` para `.env` (PowerShell: `Copy-Item .env.example .env`; macOS/Linux: `cp .env.example .env`).
-4. Crie o primeiro administrador:
-   ```bash
-   npm run criar-usuario -- gerente "umaSenhaForte123" "Nome do Gerente" --admin
-   ```
-   Se j√° houver um administrador cadastrado, n√£o execute o comando com um login existente sem inten√ß√£o de redefinir essa conta.
-5. Inicie o servidor:
-   ```bash
-   npm start
-   ```
-6. Abra `http://localhost:3000` no navegador.
+**LimitaÁ„o de persistÍncia:** `/tmp` È efÍmero e n„o È compartilhado entre inst‚ncias. SQLite, usu·rios, sessıes, chamados e anexos podem desaparecer em cold starts e divergirem entre inst‚ncias. Portanto, este deploy permite testar a integraÁ„o e os fluxos enquanto uma ˙nica inst‚ncia retÈm seu estado; n„o È adequado a dados confi·veis nem a uso real/multi-inst‚ncia. Preservando SQLite local sem serviÁo externo n„o existe configuraÁ„o que garanta persistÍncia no Vercel. A alternativa mÌnima para operaÁ„o real È manter o backend num host com disco persistente (e uploads no mesmo disco) ou posteriormente adotar armazenamento persistente compatÌvel.
 
-O SQLite e os anexos s√£o criados/localizados por padr√£o em `server/data/app.sqlite` e `server/uploads`. Fa√ßa c√≥pias de seguran√ßa desses arquivos antes de altera√ß√µes manuais. N√£o publique o banco, anexos ou arquivo `.env` em reposit√≥rios p√∫blicos.
+Crie o primeiro administrador atravÈs de `cd server` e `npm run criar-usuario -- gerente "umaSenhaForte123" "Nome do Gerente" --admin` antes de usar o deploy; o arquivo do banco criado localmente n„o ser· enviado nem compartilhado pela Function. A Vercel n„o oferece execuÁ„o interativa desse script contra o filesystem efÍmero.
 
-## Testes
+## ValidaÁ„o
 
-Na pasta `server`:
-```bash
-npm test
-```
-
-Os testes usam bancos tempor√°rios pr√≥prios e n√£o devem substituir o banco de desenvolvimento. O resultado real do comando deve ser verificado no ambiente em que as depend√™ncias nativas forem instaladas.
-
-## Vari√°veis de ambiente
-
-Consulte `server/.env.example`. `DB_PATH` e `UPLOADS_PATH` s√£o caminhos locais. N√£o s√£o uma solu√ß√£o de armazenamento persistente para fun√ß√µes serverless.
-
-## Implanta√ß√£o no Vercel: bloqueio t√©cnico conhecido
-
-**Esta vers√£o n√£o est√° pronta para ser publicada como aplica√ß√£o funcional no Vercel.** N√£o foi adicionado um `vercel.json` que encaminhe as requisi√ß√µes para um backend que, no estado atual, depende de SQLite local e arquivos de upload no disco. Isso criaria uma implanta√ß√£o aparentemente funcional, mas os dados e anexos n√£o teriam persist√™ncia confi√°vel entre execu√ß√µes serverless.
-
-Antes do deploy √© necess√°rio escolher e configurar:
-1. Um banco persistente remoto (por exemplo, PostgreSQL gerenciado) e adaptar/migrar os reposit√≥rios, autentica√ß√£o, sess√µes e migra√ß√µes para esse driver ass√≠ncrono; ou outro servi√ßo remoto comprovadamente compat√≠vel.
-2. Armazenamento persistente de objetos para anexos e adapta√ß√£o de `server/src/servicos/uploads.js` e `server/src/routes/uploads.js`.
-3. Migra√ß√£o dos dados existentes com valida√ß√£o de contagens, chaves e relacionamentos.
-4. Vari√°veis de ambiente de produ√ß√£o configuradas no painel do provedor, sem armazenar segredos no Git.
-5. Testes HTTP e de persist√™ncia no ambiente implantado.
-
-Essas etapas exigem a escolha/credenciais de servi√ßos externos. Nenhuma base remota foi criada, nenhuma migra√ß√£o de dados de produ√ß√£o foi executada e nenhum deploy foi feito. Mantenha o desenvolvimento local no SQLite at√© essa migra√ß√£o ser implementada e testada.
-
-## Estrutura relevante
-
-- `home.html`, `home.js`, `home_style.css`: listagem e detalhes dos chamados.
-- `inclusao.html`, `inclusao.js`, `inclusao_style.css`: cria√ß√£o de chamados.
-- `server/src/routes/chamados.js`: endpoints e autoriza√ß√£o de chamados.
-- `server/src/repositories/chamados.js`: consultas e persist√™ncia SQLite.
-- `server/src/auth/` e `server/src/middlewares/`: autentica√ß√£o, sess√µes e seguran√ßa.
-- `server/src/db/migrations/`: migra√ß√µes versionadas do banco.
-- `server/test/`: testes automatizados.
-
-## Regras de chamados
-
-- A edi√ß√£o do conte√∫do de chamados foi removida da interface, da API e do reposit√≥rio. `PUT /chamados/:id` aceita somente a opera√ß√£o de fechamento.
-- `DELETE /chamados/:id/excluir`: exclus√£o definitiva somente para autor ou administrador, apenas de chamados abertos. Chamados fechados/cancelados preservam hist√≥rico.
-- `DELETE /chamados/:id`: permanece sendo cancelamento com motivo, conforme o comportamento legado; n√£o confundir com exclus√£o definitiva.
-- A interface esconde a√ß√µes n√£o permitidas, mas o backend √© a autoridade final e responde `401`, `403`, `404` ou `409` conforme o caso.
+Execute `cd server; npm ci; npm test` para testes locais. O endpoint `/saude` verifica a disponibilidade do banco. ApÛs deploy, confira `/saude`, login/logout, painel e operaÁıes de chamados. Uploads s„o gravados temporariamente em `/tmp` e servidos apenas por rota autenticada.
