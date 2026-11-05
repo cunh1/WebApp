@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="inclusao.js?v=20261104-stability-1" defer></script>
+    <link rel="stylesheet" href="inclusao_style.css">
+    <link rel="stylesheet" href="frontend-modern.css">
+    <title>Inclusao</title>
+</head>
+<body>
+    <div class="tela">
+        <div class="Titulo">
+            <label class="Titulo" id="labelTitulo">XXXXXXX</label>
+        </div>
+        <div class="linha_1">
+            <textarea class="text" id="Nchamado" placeholder="Chamado"></textarea>
+            <select class="text" id="Tipo" placeholder="Tipo">
+                <option value="">Selecione...</option>
+                <option value="Manutenção">Manutenção</option>
+                <option value="T.I">T.I</option>
+            </select>
+            <select class="text" id="Evento" placeholder="Evento">
+                <option value="">Selecione...</option>
+                <option value="1"> Item 1</option>
+                <option value="2"> Item 2</option>
+                <option value="3"> Item 3</option>
+            </select>
+            <p></p>
+        </div>
+        
+        <div class="linha_2">
+            <textarea class="text" id="Solicitacao" placeholder="Solicitação"></textarea>
+        </div>
+
+        <div class="linha_3">
+            <input type="file" id="inputImagem1" accept="image/*" style="display:none">
+            <img class="image" id="imagem1" src="res/bkg.png" onclick="document.getElementById('inputImagem1').click()">
+
+            <input type="file" id="inputImagem2" accept="image/*" style="display:none">
+            <img class="image" id="imagem2" src="res/bkg.png" onclick="document.getElementById('inputImagem2').click()">
+        </div>
+
+        <div class="linha_4">
+            <button class="button" id="salvar">Salvar</button>
+            <button class="button" id="cancelar">Cancelar</button>
+        </div>
+
+    </div>
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebApp_Seiren</title>
+    <link rel="stylesheet" href="home_style.css">
+    <link rel="stylesheet" href="frontend-modern.css">
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script src="home.js?v=20261104-stability-1" defer></script>
+</head>
+<body>
+        <div id="container">
+            
+          <header class="item">
+            <img class="logo" id="logo" src="res/logo_150x150.png">
+            <label class="text" id="titulo">Sistema de Chamados</label>
+            <a id="linkUsuarios" href="usuarios.html" style="display:none;">Usuários</a>
+            <span id="usuarioLogado"></span>
+            <button id="sair" type="button">Sair</button>
+          </header>
+
+          <aside class="item">
+            <label class="text" id="menu">Menu</label>
+            <label class="textM" id="Manutencao">Manutenção</label>
+            <label class="textM" id="TI">T.I</label>
+          </aside>
+
+          <article class="item" id="areaLista">
+            <table id="chamados">
+              <thead>
+                <tr>
+                  <th>Nro</th>
+                  <th>Usuário</th>
+                  <th>Abertura</th>
+                  <th>Tipo</th>
+                  <th>Setor responsável</th>
+                  <th>Hora da Abertura</th>
+                  <th>Status</th>
+                  <th>Data do Fechamento</th>
+                  <th>Hora do Fechamento</th>
+                  <th>Atendente</th>
+                  <th>Restrito?</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!--Itens-->
+              </tbody>
+            </table>
+          </article>
+
+          <article class="item" id="areaDetalhes" aria-live="polite" hidden>
+            <div class="detalhes-topo">
+              <button type="button" class="botao-voltar" id="voltarLista" aria-label="Voltar para a listagem">← Voltar aos chamados</button>
+              <span class="detalhes-identificador" id="detalheNumero">Chamado #—</span>
+            </div>
+            <div id="detalhesConteudo" class="detalhes-conteudo">
+              <div class="detalhes-carregando">Carregando chamado…</div>
+            </div>
+          </article>
+
+          <footer class="item" id="acoesLista">
+            <button class="button" id="incluir">Incluir</button>
+            <button class="button" id="excluir" hidden>Excluir</button>
+            <button class="button" id="verCancelados" type="button">Ver cancelados</button>
+          </footer>
+        </div>
+   
+<div id="overlay">
+  <div id="modal-confirma">
+    <p id="overlayTexto">Deseja abrir um novo chamado?</p>
+    <div class="modal-botoes">
+      <button id="btnConfirmar">Confirmar</button>
+      <button id="btnCancelar">Cancelar</button>
+    </div>
+  </div>
+</div> 
+
+
+  
+</body>
+</html>

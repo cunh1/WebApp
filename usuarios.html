@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebApp_Seiren - Usuários</title>
+    <link rel="stylesheet" href="usuarios_style.css">
+    <link rel="stylesheet" href="frontend-modern.css">
+    <script src="usuarios.js" defer></script>
+</head>
+<body>
+    <div id="container">
+
+        <header class="item">
+            <img class="logo" id="logo" src="res/logo_150x150.png">
+            <label class="text" id="titulo">Gerenciamento de Usuários</label>
+            <a id="voltar" href="home.html">← Chamados</a>
+            <span id="usuarioLogado"></span>
+            <button id="sair" type="button">Sair</button>
+        </header>
+
+        <main class="item">
+            <div id="barraSuperior">
+                <input type="text" id="busca" class="text" placeholder="Pesquisar por nome ou login...">
+                <button class="button" id="novoUsuario">+ Novo usuário</button>
+            </div>
+
+            <div id="mensagem"></div>
+            <div id="carregando">Carregando usuários...</div>
+
+            <table id="tabelaUsuarios">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Login</th>
+                        <th>Cargo</th>
+                        <th>Setor</th>
+                        <th>Estado</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoUsuarios"></tbody>
+            </table>
+            <div id="listaVazia">Nenhum usuário encontrado.</div>
+        </main>
+
+    </div>
+
+    <!-- Modal de criar/editar usuário -->
+    <div id="overlayForm">
+        <div id="modalForm">
+            <p class="Titulo" id="tituloForm">Novo usuário</p>
+            <form id="formUsuario">
+                <label class="rotulo" for="campoNome">Nome</label>
+                <input type="text" id="campoNome" class="text" required>
+
+                <label class="rotulo" for="campoLogin">Login</label>
+                <input type="text" id="campoLogin" class="text" required autocomplete="off">
+
+                <label class="rotulo" for="campoSenha">
+                    <span id="rotuloSenha">Senha</span>
+                </label>
+                <input type="password" id="campoSenha" class="text" autocomplete="new-password">
+                <small id="dicaSenha">Mínimo de 8 caracteres.</small>
+
+                <label class="rotulo" for="campoPapel">Nível de acesso</label>
+                <select id="campoPapel" class="text">
+                    <option value="usuario">Usuário comum</option>
+                    <option value="ti">TI</option>
+                    <option value="manutencao">Manutenção</option>
+                    <option value="admin">Administrador</option>
+                </select>
+                <label class="rotulo" for="campoSetor">Setor (para usuário comum/administrador)</label>
+                <select id="campoSetor" class="text">
+                    <option value="">Não definido</option>
+                    <option value="TI">TI</option>
+                    <option value="Manutenção">Manutenção</option>
+                </select>
+                <div id="erroForm"></div>
+
+                <div class="modal-botoes">
+                    <button type="submit" class="button" id="salvarUsuario">Salvar</button>
+                    <button type="button" class="button" id="cancelarForm">Cancelar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal de confirmação (excluir / promover / rebaixar) -->
+    <div id="overlay">
+        <div id="modal-confirma">
+            <p id="overlayTexto">Confirma a ação?</p>
+            <div class="modal-botoes">
+                <button id="btnConfirmar">Confirmar</button>
+                <button id="btnCancelar">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
