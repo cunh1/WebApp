@@ -78,17 +78,27 @@ function desenharLinha(u) {
     const cargo = u.cargo || u.papel;
     const nomes = { admin: 'Administrador', usuario: 'Usuário comum', ti: 'TI', manutencao: 'Manutenção' };
     const ehEuMesmo = usuarioAtual && u.id === usuarioAtual.id;
+    // Ações via data-attributes + delegação de eventos: com onclick inline, um nome com apóstrofo
+    // (ex.: D'Ávila) quebrava o JavaScript do botão e abria brecha para injeção de código.
     return `<tr>
       <td>${escapar(u.nome)}</td><td>${escapar(u.login)}</td>
-      <td><span class="selo ${cargo === 'admin' ? 'selo-admin' : 'selo-usuario'}">${nomes[cargo] || cargo}</span></td>
+      <td><span class="selo ${cargo === 'admin' ? 'selo-admin' : 'selo-usuario'}">${escapar(nomes[cargo] || cargo)}</span></td>
       <td>${escapar(u.setor || (cargo === 'ti' ? 'TI' : cargo === 'manutencao' ? 'Manutenção' : '—'))}</td>
       <td>${!u.ativo ? 'Desativado' : 'Ativo'}</td>
-      <td class="acoes-usuario">
-        <button class="btn-editar" onclick="abrirEdicao(${u.id})">Editar</button>
-        <button class="btn-promover" onclick="confirmarAcao('${!u.ativo ? 'ativar' : 'desativar'}', ${u.id}, '${escapar(u.nome)}')" ${ehEuMesmo ? 'disabled title="Você não pode desativar a própria conta"' : ''}>${!u.ativo ? 'Ativar' : 'Desativar'}</button>
-        <button class="btn-excluir" onclick="confirmarAcao('excluir', ${u.id}, '${escapar(u.nome)}')" ${ehEuMesmo ? 'disabled title="Você não pode excluir a própria conta"' : ''}>Excluir</button>
-      </td></tr>`;
+      <td><div class="acoes-usuario">
+        <button type="button" class="btn-editar" data-acao="editar" data-id="${u.id}">Editar</button>
+        <button type="button" class="btn-promover" data-acao="${!u.ativo ? 'ativar' : 'desativar'}" data-id="${u.id}" data-nome="${escapar(u.nome)}" ${ehEuMesmo ? 'disabled title="Você não pode desativar a própria conta"' : ''}>${!u.ativo ? 'Ativar' : 'Desativar'}</button>
+        <button type="button" class="btn-excluir" data-acao="excluir" data-id="${u.id}" data-nome="${escapar(u.nome)}" ${ehEuMesmo ? 'disabled title="Você não pode excluir a própria conta"' : ''}>Excluir</button>
+      </div></td></tr>`;
 }
+
+corpoTabela.addEventListener('click', (evento) => {
+    const botao = evento.target.closest('button[data-acao]');
+    if (!botao || botao.disabled) return;
+    const id = Number(botao.dataset.id);
+    if (botao.dataset.acao === 'editar') window.abrirEdicao(id);
+    else window.confirmarAcao(botao.dataset.acao, id, botao.dataset.nome);
+});
 
 let temporizadorBusca;
 document.getElementById('busca').addEventListener('input', function() {
@@ -112,6 +122,7 @@ function abrirCriacao() {
     formUsuario.reset();
     erroForm.textContent = '';
     overlayForm.classList.add('ativo');
+    document.getElementById('campoNome').focus();
 }
 
 window.abrirEdicao = async function(id) {
@@ -135,6 +146,7 @@ window.abrirEdicao = async function(id) {
         document.getElementById('dicaSenha').textContent = 'Deixe em branco para manter a senha atual.';
         erroForm.textContent = '';
         overlayForm.classList.add('ativo');
+        document.getElementById('campoNome').focus();
     } catch (erro) {
         mostrarMensagem(erro.message, 'erro');
     }
@@ -205,7 +217,15 @@ window.confirmarAcao = function(acao, id, nome) {
     idPendente = id;
     overlayTexto.textContent = TEXTOS[acao](nome);
     overlay.classList.add('ativo');
+    document.getElementById('btnCancelar').focus();
 };
+
+// Esc fecha qualquer modal aberto.
+document.addEventListener('keydown', (evento) => {
+    if (evento.key !== 'Escape') return;
+    if (overlay.classList.contains('ativo')) { overlay.classList.remove('ativo'); acaoPendente = null; }
+    else if (overlayForm.classList.contains('ativo')) overlayForm.classList.remove('ativo');
+});
 
 document.getElementById('btnCancelar').addEventListener('click', () => {
     overlay.classList.remove('ativo');

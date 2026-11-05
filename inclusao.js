@@ -81,6 +81,14 @@ function limparEstadoEdicao() {
 }
 
 function configurarImagem(inputId, imagemId, marcarAlterada) {
+    // A miniatura funciona como botão: clique e teclado (Enter/Espaço) abrem o seletor de arquivo.
+    const miniatura = document.getElementById(imagemId);
+    miniatura.addEventListener('click', () => document.getElementById(inputId).click());
+    miniatura.addEventListener('keydown', (evento) => {
+        if (evento.key !== 'Enter' && evento.key !== ' ') return;
+        evento.preventDefault();
+        document.getElementById(inputId).click();
+    });
     document.getElementById(inputId).addEventListener('change', function() {
         const arquivo = this.files?.[0];
         if (!arquivo) return;

@@ -17,6 +17,9 @@
 body { color: var(--ink); background: var(--canvas); font-family: inherit; }
 button, input, select, textarea { font: inherit; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+button, a, select { touch-action: manipulation; }
+/* O reset global "appearance: none" removia a seta dos <select>; restaura o indicador de lista. */
+select { -webkit-appearance: menulist-button; appearance: auto; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
   outline: 3px solid rgba(74, 105, 196, .35); outline-offset: 2px;
 }
@@ -39,23 +42,24 @@ header.item, #container > header {
   background: linear-gradient(115deg, #263a7a, #3d56a4); border: 0; color: #fff;
 }
 #logo { width: 48px; height: 48px; object-fit: contain; border-radius: 11px; margin: 0; }
-#titulo { position: static; transform: none; margin: 0; border: 0; padding: 0; color: #fff; font-size: 18px; letter-spacing: 0; font-weight: 700; }
+#titulo { position: static; transform: none; margin: 0; border: 0; padding: 0; min-height: 0; background: transparent; box-shadow: none; color: #fff; font-size: 18px; letter-spacing: 0; font-weight: 700; }
 #linkUsuarios, #voltar { position: static; margin-left: auto; color: #fff; font-weight: 600; opacity: .94; }
 #usuarioLogado { position: static; margin-left: auto; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #e7ecff; }
 #sair { position: static; min-height: 38px; padding: 8px 13px; color: #fff; border-color: #ffffff55; background: #ffffff18; }
 #sair:hover { background: #ffffff30; }
-#linkUsuarios + #usuarioLogado { margin-left: 0; }
+#linkUsuarios + #usuarioLogado, #voltar + #usuarioLogado { margin-left: 0; }
 #container { grid-template-columns: 190px minmax(0, 1fr); grid-template-areas: "header header" "aside article" "footer footer"; grid-template-rows: auto minmax(0, 1fr) auto; min-height: calc(100vh - 36px); }
 aside.item { padding: 18px 12px; display: flex; flex-direction: column; gap: 8px; background: #fff; }
-#menu { margin: 0 0 8px; padding: 0 10px; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 750; }
-.textM { display: block; margin: 0; padding: 12px 13px; border-radius: 9px; color: #46536d; font-weight: 600; cursor: pointer; }
+#menu { margin: 0 0 8px; padding: 0 10px; border: 0; background: transparent; min-height: 0; box-shadow: none; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .1em; font-weight: 750; }
+.textM { display: block; margin: 0; padding: 12px 13px; border: 0; border-radius: 9px; background: transparent; color: #46536d; font-weight: 600; text-align: left; cursor: pointer; }
 .textM:hover, .textM.ativo { color: var(--brand-deep); background: var(--brand-soft); text-decoration: none; }
 article.item { padding: 14px; min-width: 0; background: #fff; }
 #areaLista { overflow: auto; }
-#chamados { min-width: 1050px; border-collapse: separate; border-spacing: 0; font-size: 13px; }
+#chamados { min-width: 1050px; table-layout: auto; border-collapse: separate; border-spacing: 0; font-size: 13px; }
 #chamados th { position: sticky; top: 0; z-index: 1; background: #f1f4fa; color: #526078; font-size: 11px; text-transform: uppercase; letter-spacing: .045em; }
 #chamados th, #chamados td { border: 0; border-bottom: 1px solid var(--line); padding: 12px 10px; white-space: nowrap; }
 #chamados tbody tr:hover { background: #f7f9fd; }
+#chamados tbody tr:focus-visible { outline: 3px solid rgba(74, 105, 196, .35); outline-offset: -3px; }
 #chamados tbody tr.selecionada { background: #e8edfa; }
 #acoesLista { display: flex; align-items: center; gap: 9px; padding: 12px 16px; }
 #acoesLista .button { margin: 0; }
@@ -76,9 +80,9 @@ body:has(.tela) { min-height: 100vh; padding: 24px; background: radial-gradient(
 .Titulo { margin: 0; color: var(--ink); font-size: 24px; line-height: 1.25; }
 .linha_1 { display: grid; grid-template-columns: minmax(180px, 1.4fr) minmax(150px, .8fr) minmax(150px, .8fr); width: 100%; gap: 12px; margin: 0; }
 #Nchamado { width: 100%; height: 46px; min-width: 0; resize: vertical; }
-#Tipo, #Evento { width: 100%; height: 46px; min-width: 0; }
+#Tipo, #Evento { width: 100%; height: 46px; min-width: 0; font-size: 15px; }
 .linha_2, #Solicitacao { width: 100%; }
-#Solicitacao { min-height: 170px; height: auto; resize: vertical; }
+#Solicitacao { min-height: 170px; height: auto; margin: 0; resize: vertical; }
 .linha_3 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; width: 100%; }
 #imagem1, #imagem2 { width: 100%; height: 220px; margin: 0; border: 1px dashed #c7d1e2; border-radius: 12px; background: #f5f7fb; object-fit: contain; cursor: pointer; }
 .linha_4 { display: flex; justify-content: flex-end; gap: 10px; width: 100%; }

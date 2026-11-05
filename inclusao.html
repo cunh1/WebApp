@@ -3,53 +3,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="inclusao.js?v=20261104-stability-1" defer></script>
+    <title>WebApp_Seiren - Chamado</title>
     <link rel="stylesheet" href="inclusao_style.css">
     <link rel="stylesheet" href="frontend-modern.css">
-    <title>Inclusao</title>
+    <script src="inclusao.js?v=20261104-stability-1" defer></script>
 </head>
 <body>
     <div class="tela">
-        <div class="Titulo">
-            <label class="Titulo" id="labelTitulo">XXXXXXX</label>
-        </div>
+        <h1 class="Titulo" id="labelTitulo">XXXXXXX</h1>
         <div class="linha_1">
-            <textarea class="text" id="Nchamado" placeholder="Chamado"></textarea>
-            <select class="text" id="Tipo" placeholder="Tipo">
+            <textarea class="text" id="Nchamado" placeholder="Chamado" aria-label="Chamado"></textarea>
+            <select class="text" id="Tipo" aria-label="Tipo">
                 <option value="">Selecione...</option>
                 <option value="Manutenção">Manutenção</option>
                 <option value="T.I">T.I</option>
             </select>
-            <select class="text" id="Evento" placeholder="Evento">
+            <select class="text" id="Evento" aria-label="Evento">
                 <option value="">Selecione...</option>
-                <option value="1"> Item 1</option>
-                <option value="2"> Item 2</option>
-                <option value="3"> Item 3</option>
+                <option value="1">Item 1</option>
+                <option value="2">Item 2</option>
+                <option value="3">Item 3</option>
             </select>
-            <p></p>
         </div>
         
         <div class="linha_2">
-            <textarea class="text" id="Solicitacao" placeholder="Solicitação"></textarea>
+            <textarea class="text" id="Solicitacao" placeholder="Solicitação" aria-label="Solicitação"></textarea>
         </div>
 
         <div class="linha_3">
             <input type="file" id="inputImagem1" accept="image/*" style="display:none">
-            <img class="image" id="imagem1" src="res/bkg.png" onclick="document.getElementById('inputImagem1').click()">
+            <img class="image" id="imagem1" src="res/bkg.png" alt="Anexar imagem 1" role="button" tabindex="0">
 
             <input type="file" id="inputImagem2" accept="image/*" style="display:none">
-            <img class="image" id="imagem2" src="res/bkg.png" onclick="document.getElementById('inputImagem2').click()">
+            <img class="image" id="imagem2" src="res/bkg.png" alt="Anexar imagem 2" role="button" tabindex="0">
         </div>
 
         <div class="linha_4">
-            <button class="button" id="salvar">Salvar</button>
-            <button class="button" id="cancelar">Cancelar</button>
+            <button type="button" class="button" id="salvar">Salvar</button>
+            <button type="button" class="button" id="cancelar">Cancelar</button>
         </div>
 
     </div>
-
-
-
-
 </body>
 </html>

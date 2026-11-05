@@ -6,42 +6,41 @@
     <title>WebApp_Seiren</title>
     <link rel="stylesheet" href="home_style.css">
     <link rel="stylesheet" href="frontend-modern.css">
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script src="home.js?v=20261104-stability-1" defer></script>
 </head>
 <body>
         <div id="container">
             
           <header class="item">
-            <img class="logo" id="logo" src="res/logo_150x150.png">
-            <label class="text" id="titulo">Sistema de Chamados</label>
+            <img class="logo" id="logo" src="res/logo_150x150.png" alt="Logo Seiren">
+            <h1 id="titulo">Sistema de Chamados</h1>
             <a id="linkUsuarios" href="usuarios.html" style="display:none;">Usuários</a>
             <span id="usuarioLogado"></span>
             <button id="sair" type="button">Sair</button>
           </header>
 
-          <aside class="item">
-            <label class="text" id="menu">Menu</label>
-            <label class="textM" id="Manutencao">Manutenção</label>
-            <label class="textM" id="TI">T.I</label>
+          <aside class="item" aria-labelledby="menu">
+            <h2 id="menu">Menu</h2>
+            <button type="button" class="textM" id="Manutencao" aria-pressed="false">Manutenção</button>
+            <button type="button" class="textM" id="TI" aria-pressed="false">T.I</button>
           </aside>
 
           <article class="item" id="areaLista">
-            <table id="chamados">
+            <table id="chamados" aria-label="Lista de chamados">
               <thead>
                 <tr>
-                  <th>Nro</th>
-                  <th>Usuário</th>
-                  <th>Abertura</th>
-                  <th>Tipo</th>
-                  <th>Setor responsável</th>
-                  <th>Hora da Abertura</th>
-                  <th>Status</th>
-                  <th>Data do Fechamento</th>
-                  <th>Hora do Fechamento</th>
-                  <th>Atendente</th>
-                  <th>Restrito?</th>
-                  <th>Ações</th>
+                  <th scope="col">Nro</th>
+                  <th scope="col">Usuário</th>
+                  <th scope="col">Abertura</th>
+                  <th scope="col">Tipo</th>
+                  <th scope="col">Setor responsável</th>
+                  <th scope="col">Hora da Abertura</th>
+                  <th scope="col">Status</th>
+                  <th scope="col">Data do Fechamento</th>
+                  <th scope="col">Hora do Fechamento</th>
+                  <th scope="col">Atendente</th>
+                  <th scope="col">Restrito?</th>
+                  <th scope="col">Ações</th>
                 </tr>
               </thead>
               <tbody>
@@ -61,23 +60,20 @@
           </article>
 
           <footer class="item" id="acoesLista">
-            <button class="button" id="incluir">Incluir</button>
-            <button class="button" id="excluir" hidden>Excluir</button>
+            <button type="button" class="button" id="incluir">Incluir</button>
+            <button type="button" class="button" id="excluir" hidden>Excluir</button>
             <button class="button" id="verCancelados" type="button">Ver cancelados</button>
           </footer>
         </div>
-   
+
 <div id="overlay">
-  <div id="modal-confirma">
+  <div id="modal-confirma" role="dialog" aria-modal="true" aria-labelledby="overlayTexto">
     <p id="overlayTexto">Deseja abrir um novo chamado?</p>
     <div class="modal-botoes">
-      <button id="btnConfirmar">Confirmar</button>
-      <button id="btnCancelar">Cancelar</button>
+      <button type="button" id="btnConfirmar">Confirmar</button>
+      <button type="button" id="btnCancelar">Cancelar</button>
     </div>
   </div>
-</div> 
-
-
-  
+</div>
 </body>
 </html>

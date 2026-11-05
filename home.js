@@ -2,10 +2,12 @@ const tabela = document.querySelector('article');
 
 // Mouse (desktop)
 let isDown = false;
+let arrastou = false;
 let startX, scrollLeft;
 
 tabela.addEventListener('mousedown', (e) => {
     isDown = true;
+    arrastou = false;
     tabela.style.cursor = 'grabbing';
     startX = e.pageX - tabela.offsetLeft;
     scrollLeft = tabela.scrollLeft;
@@ -16,21 +18,16 @@ tabela.addEventListener('mousemove', (e) => {
     if (!isDown) return;
     e.preventDefault();
     const x = e.pageX - tabela.offsetLeft;
+    if (Math.abs(x - startX) > 5) arrastou = true;
     tabela.scrollLeft = scrollLeft - (x - startX) * 1.5;
 });
+// Um arraste não deve ser interpretado como clique na linha (abriria o chamado sem querer).
+tabela.addEventListener('click', (e) => {
+    if (arrastou) { e.stopPropagation(); e.preventDefault(); arrastou = false; }
+}, true);
 
-// Touch (celular/tablet) - tabela
-let startTouchX, scrollLeftTouch;
-
-tabela.addEventListener('touchstart', (e) => {
-    startTouchX = e.touches[0].pageX - tabela.offsetLeft;
-    scrollLeftTouch = tabela.scrollLeft;
-});
-tabela.addEventListener('touchmove', (e) => {
-    e.preventDefault();
-    const x = e.touches[0].pageX - tabela.offsetLeft;
-    tabela.scrollLeft = scrollLeftTouch - (x - startTouchX) * 1;
-}, { passive: false });
+// Touch (celular/tablet): a rolagem nativa do navegador (overflow-x: auto) já cuida da tabela;
+// o antigo touchmove com preventDefault bloqueava também a rolagem vertical da página.
 
 // ---------------------------------------------------------------------------------------
 // Sessão: sem login válido, volta para a tela inicial. Preenche o nome de quem está logado.
@@ -330,8 +327,15 @@ function desenharLinha(chamado) {
         <td>${chamado.restrito ? 'Sim' : 'Não'}</td>
         <td class="celula-acoes">${podeExcluirChamado(chamado) ? `<button type="button" class="acao-excluir-lista" data-excluir-chamado="${chamado.id}" aria-label="Excluir chamado #${chamado.id}" title="Excluir chamado">🗑 Excluir</button>` : '—'}</td>
     `;
+    // A linha inteira abre o chamado; tabindex/Enter/Espaço dão o mesmo acesso a quem usa teclado.
+    tr.tabIndex = 0;
     tr.addEventListener('click', (evento) => {
         if (evento.target.closest('[data-excluir-chamado]')) return;
+        abrirDetalhes(chamado.id);
+    });
+    tr.addEventListener('keydown', (evento) => {
+        if (evento.target !== tr || (evento.key !== 'Enter' && evento.key !== ' ')) return;
+        evento.preventDefault();
         abrirDetalhes(chamado.id);
     });
     return tr;
@@ -372,6 +376,7 @@ async function carregarChamados() {
     try {
         const resposta = await fetch(url, { credentials: 'include' });
         if (resposta.status === 401) return window.location.href = 'inicial.html';
+        if (!resposta.ok) throw new Error('Falha ao listar chamados');
         const chamados = await resposta.json();
         corpoTabela.innerHTML = '';
         chamadoSelecionadoId = null;
@@ -389,6 +394,8 @@ function configurarFiltroMenu(idMenu, tipo) {
         filtroTipoAtual = filtroTipoAtual === tipo ? null : tipo;
         document.getElementById('Manutencao').classList.toggle('ativo', filtroTipoAtual === 'Manutenção');
         document.getElementById('TI').classList.toggle('ativo', filtroTipoAtual === 'T.I');
+        document.getElementById('Manutencao').setAttribute('aria-pressed', String(filtroTipoAtual === 'Manutenção'));
+        document.getElementById('TI').setAttribute('aria-pressed', String(filtroTipoAtual === 'T.I'));
         carregarChamados();
     });
 }
@@ -413,16 +420,25 @@ const overlay = document.getElementById('overlay');
 const overlayTexto = document.getElementById('overlayTexto');
 let acaoPendente = null; // 'incluir'
 
+// "click" cobre mouse, toque e teclado (Enter/Espaço). O antigo Hammer 'tap' não respondia ao
+// teclado e, se a CDN ficasse fora do ar, quebrava a página inteira (Hammer is not defined).
 function addTouchClick(id, fn) {
-    const el = document.getElementById(id);
-    const hammer = new Hammer(el);
-    hammer.on('tap', fn);
+    document.getElementById(id).addEventListener('click', fn);
 }
+
+function fecharOverlay() {
+    overlay.classList.remove('ativo');
+    acaoPendente = null;
+}
+document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && overlay.classList.contains('ativo')) fecharOverlay();
+});
 
 addTouchClick('incluir', function() {
     acaoPendente = 'incluir';
     overlayTexto.textContent = 'Deseja abrir um novo chamado?';
     overlay.classList.add('ativo');
+    document.getElementById('btnConfirmar').focus();
 });
 
 addTouchClick('excluir', function() { /* cancelamento exige motivo e ocorre na tela de detalhes */ });

@@ -38,8 +38,10 @@ botao.addEventListener('click', function() {
 });
 
 // Envia com Enter também, já que agora o login é assíncrono.
-document.getElementById('senha').addEventListener('keydown', function(e) {
-    if (e.key === 'Enter') login();
+['nome', 'senha'].forEach(function(id) {
+    document.getElementById(id).addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') login();
+    });
 });
 
 // Se já existe uma sessão válida (cookie ainda não expirou), pula direto para a home.

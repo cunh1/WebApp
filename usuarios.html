@@ -12,8 +12,8 @@
     <div id="container">
 
         <header class="item">
-            <img class="logo" id="logo" src="res/logo_150x150.png">
-            <label class="text" id="titulo">Gerenciamento de Usuários</label>
+            <img class="logo" id="logo" src="res/logo_150x150.png" alt="Logo Seiren">
+            <h1 id="titulo">Gerenciamento de Usuários</h1>
             <a id="voltar" href="home.html">← Chamados</a>
             <span id="usuarioLogado"></span>
             <button id="sair" type="button">Sair</button>
@@ -21,14 +21,14 @@
 
         <main class="item">
             <div id="barraSuperior">
-                <input type="text" id="busca" class="text" placeholder="Pesquisar por nome ou login...">
-                <button class="button" id="novoUsuario">+ Novo usuário</button>
+                <input type="text" id="busca" class="text" placeholder="Pesquisar por nome ou login..." aria-label="Pesquisar usuários por nome ou login">
+                <button type="button" class="button" id="novoUsuario">+ Novo usuário</button>
             </div>
 
-            <div id="mensagem"></div>
-            <div id="carregando">Carregando usuários...</div>
+            <div id="mensagem" role="status" aria-live="polite"></div>
+            <div id="carregando" role="status">Carregando usuários...</div>
 
-            <table id="tabelaUsuarios">
+            <table id="tabelaUsuarios" aria-label="Lista de usuários">
                 <thead>
                     <tr>
                         <th>Nome</th>
@@ -48,8 +48,8 @@
 
     <!-- Modal de criar/editar usuário -->
     <div id="overlayForm">
-        <div id="modalForm">
-            <p class="Titulo" id="tituloForm">Novo usuário</p>
+        <div id="modalForm" role="dialog" aria-modal="true" aria-labelledby="tituloForm">
+            <h2 class="Titulo" id="tituloForm">Novo usuário</h2>
             <form id="formUsuario">
                 <label class="rotulo" for="campoNome">Nome</label>
                 <input type="text" id="campoNome" class="text" required>
@@ -60,7 +60,7 @@
                 <label class="rotulo" for="campoSenha">
                     <span id="rotuloSenha">Senha</span>
                 </label>
-                <input type="password" id="campoSenha" class="text" autocomplete="new-password">
+                <input type="password" id="campoSenha" class="text" autocomplete="new-password" aria-describedby="dicaSenha">
                 <small id="dicaSenha">Mínimo de 8 caracteres.</small>
 
                 <label class="rotulo" for="campoPapel">Nível de acesso</label>
@@ -76,7 +76,7 @@
                     <option value="TI">TI</option>
                     <option value="Manutenção">Manutenção</option>
                 </select>
-                <div id="erroForm"></div>
+                <div id="erroForm" role="alert"></div>
 
                 <div class="modal-botoes">
                     <button type="submit" class="button" id="salvarUsuario">Salvar</button>
@@ -88,11 +88,11 @@
 
     <!-- Modal de confirmação (excluir / promover / rebaixar) -->
     <div id="overlay">
-        <div id="modal-confirma">
+        <div id="modal-confirma" role="dialog" aria-modal="true" aria-labelledby="overlayTexto">
             <p id="overlayTexto">Confirma a ação?</p>
             <div class="modal-botoes">
-                <button id="btnConfirmar">Confirmar</button>
-                <button id="btnCancelar">Cancelar</button>
+                <button type="button" id="btnConfirmar">Confirmar</button>
+                <button type="button" id="btnCancelar">Cancelar</button>
             </div>
         </div>
     </div>
