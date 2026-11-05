@@ -3,14 +3,13 @@
   "framework": "express",
   "functions": {
     "index.js": {
-      "includeFiles": "server/src/db/migrations/**/*.sql"
+      "includeFiles": "{server/src/db/migrations/**/*.sql,public/inicial.html}"
     },
     "api/index.js": {
-      "includeFiles": "server/src/db/migrations/**/*.sql"
+      "includeFiles": "{server/src/db/migrations/**/*.sql,public/inicial.html}"
     }
   },
   "rewrites": [
-    { "source": "/", "destination": "/inicial.html" },
     { "source": "/api", "destination": "/saude" },
     { "source": "/api/:path*", "destination": "/:path*" }
   ]

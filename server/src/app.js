@@ -22,6 +22,9 @@ app.use(cabecalhosSeguros);
 app.use(express.json({ limit: '20mb' }));
 app.use(carregarSessao);
 
+// The Vercel Express runtime ignores express.static(); serve the login entry explicitly.
+app.get('/', (req, res) => res.sendFile(path.join(config.pastaFrontend, 'inicial.html')));
+
 app.get('/saude', (req, res) => {
   try {
     db.prepare('SELECT 1').get();
