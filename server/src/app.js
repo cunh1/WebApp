@@ -38,8 +38,7 @@ app.use('/admin', semCache, adminRouter);
 // Anexos são servidos por uma rota autenticada, não por static público.
 app.use('/uploads', uploadsRouter);
 
-// O front-end original (home.html, inicial.html, inclusao.html, *.css, *.js, res/*) fica
-// na pasta pai deste backend — servido tal como está, sem mover nenhum arquivo de lugar.
+// Localmente, servimos a mesma pasta public/ que a Vercel publica pelo CDN.
 app.use(express.static(config.pastaFrontend, { index: 'inicial.html' }));
 
 app.use((req, res) => res.status(404).json({ erro: 'Rota não encontrada' }));

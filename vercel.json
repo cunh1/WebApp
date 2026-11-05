@@ -1,16 +1,13 @@
 {
-  "version": 2,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "functions": {
     "api/index.js": {
-      "includeFiles": "{home.html,home.js,home_style.css,inclusao.html,inclusao.js,inclusao_style.css,inicial.html,usuarios.html,usuarios.js,usuarios_style.css,style.css,frontend-modern.css,res/**,server/src/db/migrations/**}"
+      "includeFiles": "server/src/db/migrations/**"
     }
   },
   "rewrites": [
     { "source": "/", "destination": "/inicial.html" },
-    { "source": "/auth/:path*", "destination": "/api" },
-    { "source": "/chamados/:path*", "destination": "/api" },
-    { "source": "/admin/:path*", "destination": "/api" },
-    { "source": "/uploads/:path*", "destination": "/api" },
-    { "source": "/saude", "destination": "/api" }
+    { "source": "/api", "destination": "/saude" },
+    { "source": "/api/:path*", "destination": "/:path*" }
   ]
 }

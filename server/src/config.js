@@ -12,8 +12,8 @@ export const config = {
   caminhoBanco: process.env.DB_PATH || path.join(temporario, 'webapp-seiren', 'app.sqlite'),
   pastaUploads: process.env.UPLOADS_PATH || path.join(temporario, 'webapp-seiren', 'uploads'),
   pastaMigracoes: path.join(raiz, 'src', 'db', 'migrations'),
-  // In a Vercel build the project root is the frontend root.
-  pastaFrontend: process.env.VERCEL === '1' ? process.cwd() : path.resolve(raiz, '..'),
+  // Source assets live under public/ for Vercel's CDN and local Express static serving.
+  pastaFrontend: path.resolve(raiz, '..', 'public'),
 
   auth: {
     nomeCookie: producao ? '__Host-sid' : 'sid',
