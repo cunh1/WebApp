@@ -1,16 +1,19 @@
+import os from 'node:os';
 import path from 'node:path';
 
 const raiz = path.resolve(import.meta.dirname, '..');
 const producao = process.env.NODE_ENV === 'production';
+const temporario = process.env.VERCEL === '1' ? os.tmpdir() : raiz;
 
 export const config = {
   producao,
   porta: Number(process.env.PORT) || 3000,
-  caminhoBanco: process.env.DB_PATH || path.join(raiz, 'data', 'app.sqlite'),
-  pastaUploads: process.env.UPLOADS_PATH || path.join(raiz, 'uploads'),
+  // Vercel Functions have a read-only deployment bundle; /tmp is writable but ephemeral.
+  caminhoBanco: process.env.DB_PATH || path.join(temporario, 'webapp-seiren', 'app.sqlite'),
+  pastaUploads: process.env.UPLOADS_PATH || path.join(temporario, 'webapp-seiren', 'uploads'),
   pastaMigracoes: path.join(raiz, 'src', 'db', 'migrations'),
-  // Pasta onde estão os arquivos do front-end (html/css/js), um nível acima do backend.
-  pastaFrontend: path.resolve(raiz, '..'),
+  // In a Vercel build the project root is the frontend root.
+  pastaFrontend: process.env.VERCEL === '1' ? process.cwd() : path.resolve(raiz, '..'),
 
   auth: {
     nomeCookie: producao ? '__Host-sid' : 'sid',
@@ -24,7 +27,7 @@ export const config = {
   },
 
   uploads: {
-    maxBytesPorImagem: 5 * 1024 * 1024, // 5 MB por imagem, antes de decodificar o base64
+    maxBytesPorImagem: 5 * 1024 * 1024,
     tiposPermitidos: ['image/png', 'image/jpeg', 'image/webp', 'image/gif'],
   },
 };
