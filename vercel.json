@@ -2,8 +2,11 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": "express",
   "functions": {
+    "index.js": {
+      "includeFiles": "server/src/db/migrations/**/*.sql"
+    },
     "api/index.js": {
-      "includeFiles": "server/src/db/migrations/**"
+      "includeFiles": "server/src/db/migrations/**/*.sql"
     }
   },
   "rewrites": [
