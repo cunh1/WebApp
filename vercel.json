@@ -6,6 +6,11 @@
     }
   },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/", "destination": "/inicial.html" },
+    { "source": "/auth/:path*", "destination": "/api" },
+    { "source": "/chamados/:path*", "destination": "/api" },
+    { "source": "/admin/:path*", "destination": "/api" },
+    { "source": "/uploads/:path*", "destination": "/api" },
+    { "source": "/saude", "destination": "/api" }
   ]
 }
