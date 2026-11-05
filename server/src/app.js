@@ -54,3 +54,6 @@ app.use((erro, req, res, next) => {
   console.error(erro);
   res.status(500).json({ erro: 'Erro interno' });
 });
+
+// Export named for the local server and default for Vercel's function loader.
+export default app;
