@@ -263,7 +263,11 @@ detalhesConteudo.addEventListener('click', async (evento) => {
     if (botao.id === 'detalheExcluirDefinitivo') {
         const id = chamadoDetalhadoId;
         const tituloChamado = detalhesConteudo.querySelector('.detalhe-cabecalho h1')?.textContent || `Chamado #${id}`;
-        const confirmar = window.confirm(`Tem certeza que deseja excluir definitivamente ${tituloChamado}? Esta ação não pode ser desfeita.`);
+        const confirmar = await solicitarConfirmacao({
+            titulo: 'Excluir chamado definitivamente?',
+            descricao: `Tem certeza que deseja excluir ${tituloChamado}? Esta ação não pode ser desfeita.`,
+            destrutiva: true,
+        });
         if (!confirmar) return;
         if (botao.dataset.enviando === '1') return;
         botao.dataset.enviando = '1';
@@ -347,7 +351,12 @@ corpoTabela.addEventListener('click', async (evento) => {
     evento.stopPropagation();
     const id = Number(botao.dataset.excluirChamado);
     if (!Number.isInteger(id) || id < 1 || botao.disabled) return;
-    if (!window.confirm(`Tem certeza que deseja excluir definitivamente o chamado #${id}? Esta ação não pode ser desfeita.`)) return;
+    const confirmar = await solicitarConfirmacao({
+        titulo: 'Excluir chamado definitivamente?',
+        descricao: `Tem certeza que deseja excluir o chamado #${id}? Esta ação não pode ser desfeita.`,
+        destrutiva: true,
+    });
+    if (!confirmar) return;
     botao.disabled = true;
     try {
         const resposta = await fetch(`/chamados/${id}/excluir`, { method: 'DELETE', credentials: 'include' });
@@ -417,8 +426,10 @@ if (botaoCancelados) botaoCancelados.addEventListener('click', async () => {
 // com o botão que foi clicado.
 // ---------------------------------------------------------------------------------------
 const overlay = document.getElementById('overlay');
+const overlayTitulo = document.getElementById('overlayTitulo');
 const overlayTexto = document.getElementById('overlayTexto');
 let acaoPendente = null; // 'incluir'
+let resolverConfirmacao = null;
 
 // "click" cobre mouse, toque e teclado (Enter/Espaço). O antigo Hammer 'tap' não respondia ao
 // teclado e, se a CDN ficasse fora do ar, quebrava a página inteira (Hammer is not defined).
@@ -426,9 +437,15 @@ function addTouchClick(id, fn) {
     document.getElementById(id).addEventListener('click', fn);
 }
 
-function fecharOverlay() {
+function fecharOverlay(confirmado = false) {
     overlay.classList.remove('ativo');
+    document.getElementById('modal-confirma').classList.remove('acao-destrutiva');
     acaoPendente = null;
+    if (resolverConfirmacao) {
+        const resolver = resolverConfirmacao;
+        resolverConfirmacao = null;
+        resolver(confirmado);
+    }
 }
 document.addEventListener('keydown', (evento) => {
     if (evento.key === 'Escape' && overlay.classList.contains('ativo')) fecharOverlay();
@@ -436,17 +453,35 @@ document.addEventListener('keydown', (evento) => {
 
 addTouchClick('incluir', function() {
     acaoPendente = 'incluir';
+    overlayTitulo.textContent = 'Abrir chamado';
     overlayTexto.textContent = 'Deseja abrir um novo chamado?';
+    document.getElementById('btnConfirmar').textContent = 'Continuar';
     overlay.classList.add('ativo');
     document.getElementById('btnConfirmar').focus();
 });
 
+function solicitarConfirmacao({ titulo, descricao, destrutiva = false }) {
+    overlayTitulo.textContent = titulo;
+    overlayTexto.textContent = descricao;
+    acaoPendente = null;
+    document.getElementById('btnConfirmar').textContent = 'Confirmar';
+    document.getElementById('modal-confirma').classList.toggle('acao-destrutiva', destrutiva);
+    overlay.classList.add('ativo');
+    document.getElementById('btnCancelar').focus();
+    return new Promise((resolve) => { resolverConfirmacao = resolve; });
+}
+
 addTouchClick('excluir', function() { /* cancelamento exige motivo e ocorre na tela de detalhes */ });
 
 addTouchClick('btnConfirmar', async function() {
-    overlay.classList.remove('ativo');
+    if (resolverConfirmacao) {
+        fecharOverlay(true);
+        return;
+    }
+    const acao = acaoPendente;
+    fecharOverlay();
 
-    if (acaoPendente === 'incluir') {
+    if (acao === 'incluir') {
         localStorage.setItem('titulo', 'Inclusão de Chamado');
         localStorage.removeItem('chamadoId');
         window.location.href = 'inclusao.html';
@@ -455,8 +490,7 @@ addTouchClick('btnConfirmar', async function() {
 });
 
 addTouchClick('btnCancelar', function() {
-    overlay.classList.remove('ativo');
-    acaoPendente = null;
+    fecharOverlay(false);
 });
 
 verificarSessao();
