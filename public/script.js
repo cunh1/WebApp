@@ -6,7 +6,7 @@ async function login() {
     const botao = document.getElementById('botao');
 
     if (usuario === '' || senha === '') {
-        alert('Preencha login e senha!');
+        window.showToast('Preencha login e senha!', 'warning');
         return;
     }
 
@@ -20,12 +20,12 @@ async function login() {
         });
         if (!resposta.ok) {
             const dados = await resposta.json().catch(() => ({}));
-            alert(dados.erro || 'Login ou senha incorretos!');
+            window.showToast(dados.erro || 'Login ou senha incorretos!', 'error');
             return;
         }
         window.location.href = 'home.html';
     } catch (erro) {
-        alert('Não foi possível conectar ao servidor.');
+        window.showToast('Não foi possível conectar ao servidor.', 'error');
         console.error(erro);
     } finally {
         botao.disabled = false;

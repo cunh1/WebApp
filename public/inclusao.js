@@ -31,7 +31,7 @@ window.addEventListener('load', async () => {
 
     if (idSalvo !== null && idSalvo !== '') {
         if (!/^\d+$/.test(idSalvo) || Number(idSalvo) < 1) {
-            alert('O identificador do chamado é inválido. Abra o chamado novamente pela listagem.');
+            window.showToastOnNextPage('O identificador do chamado é inválido. Abra o chamado novamente pela listagem.', 'error');
             limparEstadoEdicao();
             window.location.href = 'home.html';
             return;
@@ -58,14 +58,14 @@ window.addEventListener('load', async () => {
             if (chamado.imagem1) document.getElementById('imagem1').src = chamado.imagem1;
             if (chamado.imagem2) document.getElementById('imagem2').src = chamado.imagem2;
         } catch (erro) {
-            alert(erro.message || 'Não foi possível carregar o chamado selecionado.');
+            window.showToastOnNextPage(erro.message || 'Não foi possível carregar o chamado selecionado.', 'error');
             limparEstadoEdicao();
             window.location.href = 'home.html';
             return;
         }
     } else {
         if (tituloSalvo === 'Alteração de Chamado') {
-            alert('Não foi possível identificar o chamado que será editado. Abra-o novamente pela lista.');
+            window.showToastOnNextPage('Não foi possível identificar o chamado que será editado. Abra-o novamente pela lista.', 'error');
             limparEstadoEdicao();
             window.location.href = 'home.html';
             return;
@@ -93,7 +93,7 @@ function configurarImagem(inputId, imagemId, marcarAlterada) {
         const arquivo = this.files?.[0];
         if (!arquivo) return;
         if (!arquivo.type.startsWith('image/')) {
-            alert('Selecione um arquivo de imagem válido.');
+            window.showToast('Selecione um arquivo de imagem válido.', 'warning');
             this.value = '';
             return;
         }
@@ -105,7 +105,7 @@ function configurarImagem(inputId, imagemId, marcarAlterada) {
             botaoSalvar.disabled = false;
         };
         leitor.onerror = () => {
-            alert('Não foi possível carregar a imagem selecionada.');
+            window.showToast('Não foi possível carregar a imagem selecionada.', 'error');
             botaoSalvar.disabled = false;
         };
         leitor.readAsDataURL(arquivo);
@@ -132,11 +132,11 @@ botaoSalvar.addEventListener('click', async () => {
     };
 
     if (!dados.descricao || !dados.tipo || !dados.setorResponsavel) {
-        alert('Preencha a descrição e selecione um tipo/setor válido.');
+        window.showToast('Preencha a descrição e selecione um tipo/setor válido.', 'warning');
         return;
     }
     if (modoAlteracao && (!chamadoIdAtual || !/^\d+$/.test(chamadoIdAtual))) {
-        alert('Não foi possível identificar o chamado que será alterado. Volte à lista e abra o chamado novamente.');
+        window.showToast('Não foi possível identificar o chamado que será alterado. Volte à lista e abra o chamado novamente.', 'error');
         return;
     }
 
@@ -155,11 +155,11 @@ botaoSalvar.addEventListener('click', async () => {
         if (!resposta.ok) throw new Error((resultado.erros && resultado.erros.join('; ')) || resultado.erro || 'Erro ao salvar o chamado.');
 
         const idSalvo = modoAlteracao ? chamadoIdAtual : resultado.id;
-        alert(modoAlteracao ? 'Chamado atualizado com sucesso.' : 'Chamado criado com sucesso.');
+        window.showToastOnNextPage(modoAlteracao ? 'Chamado atualizado com sucesso.' : 'Chamado criado com sucesso.', 'success');
         limparEstadoEdicao();
         window.location.href = modoAlteracao && idSalvo ? `home.html#chamado-${idSalvo}` : 'home.html';
     } catch (erro) {
-        alert(`Erro ao salvar: ${erro.message}`);
+        window.showToast(`Erro ao salvar: ${erro.message}`, 'error');
         console.error(erro);
     } finally {
         botaoSalvar.disabled = false;

@@ -6,10 +6,7 @@ function escapar(texto) {
 }
 
 function mostrarMensagem(texto, tipo) {
-    const el = document.getElementById('mensagem');
-    el.textContent = texto;
-    el.className = tipo; // 'sucesso' | 'erro'
-    setTimeout(() => { el.className = ''; }, 5000);
+    window.showToast(texto, tipo === 'sucesso' ? 'success' : tipo === 'aviso' ? 'warning' : 'error');
 }
 
 // ---------------------------------------------------------------------------------------

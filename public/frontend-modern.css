@@ -161,3 +161,46 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
 }
+
+/* Notificações toast compartilhadas */
+.toast-region {
+  position: fixed; z-index: 2000; top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right)); display: grid; gap: 10px;
+  width: min(390px, calc(100vw - 36px)); pointer-events: none;
+}
+.toast {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr) 32px; align-items: center; gap: 10px;
+  padding: 13px 12px; border: 1px solid var(--line, #e1e7f0);
+  border-left: 4px solid var(--toast-accent, #344b9a); border-radius: 13px;
+  background: var(--paper, #fff); color: var(--ink, #172033);
+  box-shadow: 0 12px 32px rgba(24, 39, 75, .16); pointer-events: auto;
+  opacity: 0; transform: translate3d(18px, -8px, 0);
+  transition: opacity .22s ease, transform .22s ease; animation: toast-enter .22s ease forwards;
+}
+.toast--success { --toast-accent: #168653; }
+.toast--error { --toast-accent: #dd1e2b; }
+.toast--warning { --toast-accent: #bd7900; }
+.toast--info { --toast-accent: #344b9a; }
+.toast__icon {
+  display: grid; place-items: center; width: 28px; height: 28px; border-radius: 50%;
+  background: color-mix(in srgb, var(--toast-accent) 12%, white); color: var(--toast-accent);
+  font-size: 15px; font-weight: 800;
+}
+.toast__message { margin: 0; font-size: 14px; line-height: 1.45; overflow-wrap: anywhere; }
+.toast__close {
+  width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px;
+  background: transparent; color: var(--muted, #69758b); font-size: 23px; line-height: 1; cursor: pointer;
+}
+.toast__close:hover { background: #f1f4f9; color: var(--ink, #172033); }
+.toast--leaving { opacity: 0; transform: translate3d(12px, -6px, 0); }
+@keyframes toast-enter { to { opacity: 1; transform: translate3d(0, 0, 0); } }
+@media (max-width: 560px) {
+  .toast-region {
+    top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right));
+    left: max(10px, env(safe-area-inset-left)); width: auto;
+  }
+  .toast { padding: 11px 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .toast { animation: none; opacity: 1; transform: none; transition: opacity .01ms; }
+}

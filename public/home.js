@@ -275,33 +275,33 @@ detalhesConteudo.addEventListener('click', async (evento) => {
             chamadoDetalhadoId = null;
             await carregarChamados();
             voltarParaLista();
-            alert(`Chamado #${id} excluído com sucesso.`);
+            window.showToast(`Chamado #${id} excluído com sucesso.`, 'success');
         } catch (e) {
             botao.disabled = false;
             delete botao.dataset.enviando;
-            alert(e.message);
+            window.showToast(e.message, 'error');
         }
         return;
     }
     if (botao.id === 'detalheExcluir') {
         const motivo = window.prompt('Informe o motivo do cancelamento deste chamado:');
-        if (!motivo || !motivo.trim()) return alert('O motivo do cancelamento é obrigatório.');
+        if (!motivo || !motivo.trim()) return window.showToast('O motivo do cancelamento é obrigatório.', 'warning');
         try {
             const r = await fetch(`/chamados/${chamadoDetalhadoId}`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ motivo: motivo.trim() }) });
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.erro || 'Não foi possível cancelar o chamado.');
             await carregarChamados(); await abrirDetalhes(chamadoDetalhadoId, { atualizarUrl:false });
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, 'error'); }
     }
     if (botao.id === 'detalheFechar') {
         const solucao = window.prompt('Descreva a solução aplicada antes de fechar o chamado:');
-        if (!solucao || !solucao.trim()) return alert('A solução é obrigatória para fechar o chamado.');
+        if (!solucao || !solucao.trim()) return window.showToast('A solução é obrigatória para fechar o chamado.', 'warning');
         try {
             const r = await fetch(`/chamados/${chamadoDetalhadoId}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ status: 'fechado', solucao: solucao.trim() }) });
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.erro || 'Não foi possível fechar o chamado.');
             await carregarChamados(); await abrirDetalhes(chamadoDetalhadoId, { atualizarUrl:false });
-        } catch (e) { alert(e.message); }
+        } catch (e) { window.showToast(e.message, 'error'); }
     }
 });
 
@@ -354,10 +354,10 @@ corpoTabela.addEventListener('click', async (evento) => {
         const dados = await resposta.json().catch(() => ({}));
         if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível excluir o chamado.');
         await carregarChamados();
-        alert(`Chamado #${id} excluído com sucesso.`);
+        window.showToast(`Chamado #${id} excluído com sucesso.`, 'success');
     } catch (erro) {
         botao.disabled = false;
-        alert(erro.message);
+        window.showToast(erro.message, 'error');
     }
 });
 
@@ -382,7 +382,7 @@ async function carregarChamados() {
         chamadoSelecionadoId = null;
         for (const chamado of chamados) corpoTabela.appendChild(desenharLinha(chamado));
     } catch (erro) {
-        alert('Não foi possível carregar os chamados.');
+        window.showToast('Não foi possível carregar os chamados.', 'error');
         console.error(erro);
     }
 }
