@@ -258,6 +258,11 @@ detalhesConteudo.addEventListener('click', async (evento) => {
     if (!botao) return;
     if (botao.id === 'detalheAlterar') {
         if (!chamadoDetalhadoId) return;
+        const confirmar = await solicitarConfirmacao({
+            titulo: 'Alterar chamado?',
+            descricao: 'Você será direcionado ao formulário para atualizar este chamado. Deseja continuar?',
+        });
+        if (!confirmar) return;
         localStorage.setItem('titulo', 'Alteração de Chamado');
         localStorage.setItem('chamadoId', String(chamadoDetalhadoId));
         window.location.href = `inclusao.html?chamadoId=${encodeURIComponent(chamadoDetalhadoId)}`;
@@ -290,13 +295,19 @@ detalhesConteudo.addEventListener('click', async (evento) => {
         return;
     }
     if (botao.id === 'detalheExcluir') {
-        const motivo = window.prompt('Informe o motivo do cancelamento deste chamado:');
-        if (!motivo || !motivo.trim()) return window.showToast('O motivo do cancelamento é obrigatório.', 'warning');
+        const motivo = await solicitarConfirmacao({
+            titulo: 'Cancelar chamado?',
+            descricao: 'Informe o motivo do cancelamento. Esta ação será registrada no chamado.',
+            campo: { rotulo: 'Motivo do cancelamento', placeholder: 'Descreva o motivo' },
+            destrutiva: true,
+        });
+        if (!motivo) return;
         try {
             const r = await fetch(`/chamados/${chamadoDetalhadoId}`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ motivo: motivo.trim() }) });
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.erro || 'Não foi possível cancelar o chamado.');
             await carregarChamados(); await abrirDetalhes(chamadoDetalhadoId, { atualizarUrl:false });
+            window.showToast(`Chamado #${chamadoDetalhadoId} cancelado com sucesso.`, 'success');
         } catch (e) { window.showToast(e.message, 'error'); }
     }
     if (botao.id === 'detalheFechar') {
@@ -460,6 +471,8 @@ document.getElementById('limparFiltrosChamados').addEventListener('click', async
 const overlay = document.getElementById('overlay');
 const overlayTitulo = document.getElementById('overlayTitulo');
 const overlayTexto = document.getElementById('overlayTexto');
+const overlayCampoRotulo = document.getElementById('overlayCampoRotulo');
+const overlayCampoTexto = document.getElementById('overlayCampoTexto');
 let acaoPendente = null; // 'incluir'
 let resolverConfirmacao = null;
 
@@ -472,6 +485,9 @@ function addTouchClick(id, fn) {
 function fecharOverlay(confirmado = false) {
     overlay.classList.remove('ativo');
     document.getElementById('modal-confirma').classList.remove('acao-destrutiva');
+    overlayCampoRotulo.hidden = true;
+    overlayCampoTexto.hidden = true;
+    overlayCampoTexto.value = '';
     acaoPendente = null;
     if (resolverConfirmacao) {
         const resolver = resolverConfirmacao;
@@ -492,14 +508,21 @@ addTouchClick('incluir', function() {
     document.getElementById('btnConfirmar').focus();
 });
 
-function solicitarConfirmacao({ titulo, descricao, destrutiva = false }) {
+function solicitarConfirmacao({ titulo, descricao, destrutiva = false, campo = null }) {
     overlayTitulo.textContent = titulo;
     overlayTexto.textContent = descricao;
     acaoPendente = null;
     document.getElementById('btnConfirmar').textContent = 'Confirmar';
     document.getElementById('modal-confirma').classList.toggle('acao-destrutiva', destrutiva);
+    overlayCampoRotulo.hidden = !campo;
+    overlayCampoTexto.hidden = !campo;
+    overlayCampoTexto.value = '';
+    if (campo) {
+        overlayCampoRotulo.textContent = campo.rotulo;
+        overlayCampoTexto.placeholder = campo.placeholder || '';
+    }
     overlay.classList.add('ativo');
-    document.getElementById('btnCancelar').focus();
+    (campo ? overlayCampoTexto : document.getElementById('btnCancelar')).focus();
     return new Promise((resolve) => { resolverConfirmacao = resolve; });
 }
 
@@ -507,7 +530,13 @@ addTouchClick('excluir', function() { /* cancelamento exige motivo e ocorre na t
 
 addTouchClick('btnConfirmar', async function() {
     if (resolverConfirmacao) {
-        fecharOverlay(true);
+        const motivo = overlayCampoTexto.hidden ? true : overlayCampoTexto.value.trim();
+        if (!motivo) {
+            window.showToast('O motivo do cancelamento é obrigatório.', 'warning');
+            overlayCampoTexto.focus();
+            return;
+        }
+        fecharOverlay(motivo);
         return;
     }
     const acao = acaoPendente;

@@ -71,6 +71,9 @@ article.item { padding: 14px; min-width: 0; background: #fff; }
 #modal-confirma, #modalForm { width: min(100%, 520px); max-height: min(88dvh, 820px); overflow: auto; padding: 26px; border: 1px solid var(--line); border-radius: 18px; text-align: left; box-shadow: 0 24px 70px #10182a40; }
 #modal-confirma p { color: var(--ink); font-size: 16px; line-height: 1.6; }
 #overlayTitulo { margin: 0 0 10px; color: var(--ink); font-size: 20px; line-height: 1.3; }
+#overlayCampoRotulo { display: block; margin: 14px 0 6px; color: #4c5870; font-size: 13px; font-weight: 650; }
+#overlayCampoTexto { display: block; width: 100%; min-height: 94px; resize: vertical; }
+#overlayCampoRotulo[hidden], #overlayCampoTexto[hidden] { display: none; }
 .acao-destrutiva #btnConfirmar { background: var(--danger); color: #fff; }
 .acao-destrutiva #btnConfirmar:hover { background: #b71924; }
 .modal-botoes { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 9px; margin-top: 18px; }
