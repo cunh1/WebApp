@@ -65,6 +65,8 @@ document.getElementById('sair').addEventListener('click', async function() {
 // Tabela de chamados: carrega da API e desenha as linhas (antes ficava sempre vazia).
 // ---------------------------------------------------------------------------------------
 const corpoTabela = document.querySelector('#chamados tbody');
+const tabelaChamados = document.getElementById('chamados');
+const estadoVazioChamados = document.getElementById('estadoVazioChamados');
 let chamadoSelecionadoId = null;
 let filtroTipoAtual = null;
 let incluirCancelados = false;
@@ -390,6 +392,22 @@ async function carregarChamados() {
         corpoTabela.innerHTML = '';
         chamadoSelecionadoId = null;
         for (const chamado of chamados) corpoTabela.appendChild(desenharLinha(chamado));
+        if (chamados.length === 0) {
+            const haFiltros = Boolean(filtroTipoAtual || incluirCancelados);
+            tabelaChamados.hidden = true;
+            estadoVazioChamados.hidden = false;
+            document.getElementById('estadoVazioChamadosTitulo').textContent = haFiltros
+                ? 'Nenhum chamado encontrado para esta visualização'
+                : 'Nenhum chamado cadastrado';
+            document.getElementById('estadoVazioChamadosTexto').textContent = haFiltros
+                ? 'Não há chamados que correspondam ao setor ou à visualização selecionada. Limpe os filtros para ver todos.'
+                : 'Quando um chamado for criado, ele aparecerá nesta lista.';
+            document.getElementById('criarChamadoVazio').hidden = haFiltros;
+            document.getElementById('limparFiltrosChamados').hidden = !haFiltros;
+        } else {
+            tabelaChamados.hidden = false;
+            estadoVazioChamados.hidden = true;
+        }
     } catch (erro) {
         window.showToast('Não foi possível carregar os chamados.', 'error');
         console.error(erro);
@@ -415,6 +433,20 @@ const botaoCancelados = document.getElementById('verCancelados');
 if (botaoCancelados) botaoCancelados.addEventListener('click', async () => {
     incluirCancelados = !incluirCancelados;
     botaoCancelados.textContent = incluirCancelados ? 'Ocultar cancelados' : 'Ver cancelados';
+    await carregarChamados();
+});
+
+document.getElementById('criarChamadoVazio').addEventListener('click', () => {
+    document.getElementById('incluir').click();
+});
+document.getElementById('limparFiltrosChamados').addEventListener('click', async () => {
+    filtroTipoAtual = null;
+    incluirCancelados = false;
+    document.getElementById('Manutencao').classList.remove('ativo');
+    document.getElementById('TI').classList.remove('ativo');
+    document.getElementById('Manutencao').setAttribute('aria-pressed', 'false');
+    document.getElementById('TI').setAttribute('aria-pressed', 'false');
+    botaoCancelados.textContent = 'Ver cancelados';
     await carregarChamados();
 });
 

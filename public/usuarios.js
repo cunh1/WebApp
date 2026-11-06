@@ -47,7 +47,7 @@ const listaVazia = document.getElementById('listaVazia');
 async function carregarUsuarios() {
     const termo = document.getElementById('busca').value.trim();
     tabela.style.display = 'none';
-    listaVazia.style.display = 'none';
+    listaVazia.hidden = true;
     carregando.style.display = 'block';
 
     try {
@@ -60,7 +60,16 @@ async function carregarUsuarios() {
         const lista = await resposta.json();
         carregando.style.display = 'none';
         if (!lista.length) {
-            listaVazia.style.display = 'block';
+            const buscando = Boolean(termo);
+            document.getElementById('listaVaziaTitulo').textContent = buscando
+                ? 'Nenhum usuário encontrado'
+                : 'Nenhum usuário cadastrado';
+            document.getElementById('listaVaziaTexto').textContent = buscando
+                ? 'Não encontramos usuários com esse nome ou login. Limpe a busca para ver todos.'
+                : 'Cadastre um usuário para que ele apareça nesta lista.';
+            document.getElementById('criarPrimeiroUsuario').hidden = buscando;
+            document.getElementById('limparBusca').hidden = !buscando;
+            listaVazia.hidden = false;
             return;
         }
         corpoTabela.innerHTML = lista.map(desenharLinha).join('');
@@ -70,6 +79,14 @@ async function carregarUsuarios() {
         mostrarMensagem(erro.message, 'erro');
     }
 }
+
+document.getElementById('criarPrimeiroUsuario').addEventListener('click', () => {
+    document.getElementById('novoUsuario').click();
+});
+document.getElementById('limparBusca').addEventListener('click', () => {
+    document.getElementById('busca').value = '';
+    carregarUsuarios();
+});
 
 function desenharLinha(u) {
     const cargo = u.cargo || u.papel;

@@ -27,7 +27,7 @@
           </aside>
 
           <article class="item" id="areaLista">
-            <table id="chamados" aria-label="Lista de chamados">
+            <table id="chamados" aria-label="Lista de chamados" hidden>
               <thead>
                 <tr>
                   <th scope="col">Nro</th>
@@ -48,6 +48,17 @@
                 <!--Itens-->
               </tbody>
             </table>
+            <section id="estadoVazioChamados" class="empty-state" role="status" aria-live="polite" hidden>
+              <span class="empty-state__icon" aria-hidden="true">
+                <svg viewBox="0 0 48 48" focusable="false"><path d="M8 10h32v28H8zM8 17h32M18 17v4m12-4v4M16 27h16M16 33h10" /></svg>
+              </span>
+              <h2 id="estadoVazioChamadosTitulo">Nenhum chamado cadastrado</h2>
+              <p id="estadoVazioChamadosTexto">Quando um chamado for criado, ele aparecerá nesta lista.</p>
+              <div class="empty-state__actions">
+                <button type="button" class="button" id="criarChamadoVazio">Criar chamado</button>
+                <button type="button" class="button empty-state__secondary" id="limparFiltrosChamados" hidden>Limpar filtros</button>
+              </div>
+            </section>
           </article>
 
           <article class="item" id="areaDetalhes" aria-live="polite" hidden>

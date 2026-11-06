@@ -42,7 +42,17 @@
                 </thead>
                 <tbody id="corpoUsuarios"></tbody>
             </table>
-            <div id="listaVazia">Nenhum usuário encontrado.</div>
+            <section id="listaVazia" class="empty-state" role="status" aria-live="polite" hidden>
+                <span class="empty-state__icon" aria-hidden="true">
+                    <svg viewBox="0 0 48 48" focusable="false"><path d="M24 24a8 8 0 1 0 0-16 8 8 0 0 0 0 16ZM9 41c1-8 6-12 15-12s14 4 15 12M37 11v10m-5-5h10" /></svg>
+                </span>
+                <h2 id="listaVaziaTitulo">Nenhum usuário cadastrado</h2>
+                <p id="listaVaziaTexto">Cadastre um usuário para que ele apareça nesta lista.</p>
+                <div class="empty-state__actions">
+                    <button type="button" class="button" id="criarPrimeiroUsuario">Criar usuário</button>
+                    <button type="button" class="button empty-state__secondary" id="limparBusca" hidden>Limpar busca</button>
+                </div>
+            </section>
         </main>
 
     </div>
