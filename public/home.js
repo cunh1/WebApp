@@ -311,13 +311,18 @@ detalhesConteudo.addEventListener('click', async (evento) => {
         } catch (e) { window.showToast(e.message, 'error'); }
     }
     if (botao.id === 'detalheFechar') {
-        const solucao = window.prompt('Descreva a solução aplicada antes de fechar o chamado:');
-        if (!solucao || !solucao.trim()) return window.showToast('A solução é obrigatória para fechar o chamado.', 'warning');
+        const solucao = await solicitarConfirmacao({
+            titulo: 'Fechar chamado?',
+            descricao: 'Confirme o fechamento e informe a solução aplicada. Esse registro ficará associado ao chamado.',
+            campo: { rotulo: 'Solução aplicada', placeholder: 'Descreva a solução' },
+        });
+        if (!solucao) return;
         try {
             const r = await fetch(`/chamados/${chamadoDetalhadoId}`, { method: 'PUT', headers: {'Content-Type':'application/json'}, credentials:'include', body: JSON.stringify({ status: 'fechado', solucao: solucao.trim() }) });
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.erro || 'Não foi possível fechar o chamado.');
             await carregarChamados(); await abrirDetalhes(chamadoDetalhadoId, { atualizarUrl:false });
+            window.showToast(`Chamado #${chamadoDetalhadoId} fechado com sucesso.`, 'success');
         } catch (e) { window.showToast(e.message, 'error'); }
     }
 });
