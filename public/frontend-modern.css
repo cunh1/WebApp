@@ -202,19 +202,17 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
   .mobile-nav-chevron { width: 17px; height: 17px; margin-left: auto; fill: none; stroke: var(--muted); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .2s ease; }
   .nav-mobile-aberto .mobile-nav-chevron { transform: rotate(180deg); }
   .mobile-nav-options {
-    display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; max-height: 0; padding-top: 0;
+    display: flex; flex-direction: row; align-items: center; gap: 8px; max-height: 0; padding-top: 0;
     overflow: hidden; opacity: 0; visibility: hidden; transform: translateY(-5px); pointer-events: none;
     transition: max-height .22s ease, padding .22s ease, opacity .18s ease, transform .18s ease, visibility 0s linear .22s;
   }
   .nav-mobile-aberto .mobile-nav-options {
-    max-height: 180px; padding-top: 10px; opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; transition-delay: 0s;
+    max-height: 64px; padding-top: 8px; opacity: 1; visibility: visible; transform: translateY(0); pointer-events: auto; transition-delay: 0s;
   }
-  #menu { grid-column: 1 / -1; margin: 0 0 1px; padding: 0 3px; font-size: 10px; }
-  .textM { display: flex; flex: 1 1 0; align-items: center; justify-content: flex-start; gap: 9px; min-height: 48px; padding: 10px 12px; border: 1px solid var(--line); background: #fff; }
-  .textM:hover, .textM.ativo { border-color: #c9d2eb; background: var(--brand-soft); }
-  .mobile-nav-icon { display: grid; place-items: center; width: 28px; height: 28px; flex: 0 0 auto; border-radius: 8px; background: #eef1fa; color: var(--brand); }
-  .mobile-nav-icon svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-  .textM.ativo .mobile-nav-icon { background: #d7def5; }
+  .mobile-nav-options::-webkit-scrollbar { display: none; }
+  #menu { flex: 0 0 auto; margin: 0; }
+  .textM { display: block; flex: 0 0 auto; min-height: 42px; padding: 11px 13px; border: 0; border-radius: 9px; background: transparent; color: #46536d; font-weight: 600; text-align: left; }
+  .textM:hover, .textM.ativo { color: var(--brand-deep); background: var(--brand-soft); text-decoration: none; }
   #areaLista { padding: 8px; }
   #container > header { gap: 9px; padding: 10px 12px; }
   #usuarioLogado { max-width: 22vw; font-size: 12px; }
@@ -232,8 +230,7 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
   #usuarioLogado { display: none; }
   #linkUsuarios, #voltar { margin-left: auto; padding: 7px 9px; gap: 6px; font-size: 12px; white-space: nowrap; }
   #linkUsuarios svg, #voltar svg { width: 15px; height: 15px; }
-  .mobile-nav-options { gap: 7px; }
-  .textM { min-width: 0; padding: 9px 10px; font-size: 13px; }
+  .mobile-nav-options { gap: 7px; scrollbar-width: none; }
   #sair { min-height: 36px; padding: 7px 10px; font-size: 12px; }
   #acoesLista { flex-wrap: wrap; }
   #acoesLista .button { flex: 1 1 auto; min-height: 44px; }
