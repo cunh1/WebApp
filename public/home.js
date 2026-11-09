@@ -40,7 +40,7 @@ async function verificarSessao() {
         if (!resposta.ok) throw new Error('sem sessão');
         const dados = await resposta.json();
         usuarioAtual = dados.usuario;
-        document.getElementById('usuarioLogado').textContent = usuarioAtual.nome;
+        window.configurarMenuPerfil(usuarioAtual);
         if (usuarioAtual.papel === 'admin') document.getElementById('linkUsuarios').style.display = 'inline';
         // Todos os cargos podem consultar chamados de todos os setores; a API aplica
         // as permissões de edição, fechamento e cancelamento.

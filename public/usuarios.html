@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="usuarios_style.css">
     <link rel="stylesheet" href="frontend-modern.css">
     <script src="toast.js" defer></script>
+    <script src="profile-menu.js" defer></script>
     <script src="usuarios.js" defer></script>
 </head>
 <body>
@@ -16,8 +17,23 @@
             <img class="logo" id="logo" src="res/logo_150x150.png" alt="Logo Seiren">
             <h1 id="titulo">Gerenciamento de Usuários</h1>
             <a id="voltar" href="home.html">← Chamados</a>
-            <span id="usuarioLogado"></span>
-            <button id="sair" type="button">Sair</button>
+            <div class="profile-menu" id="menuPerfil">
+              <button class="profile-trigger" id="alternarMenuPerfil" type="button" aria-expanded="false" aria-controls="menuPerfilDropdown">
+                <span class="profile-avatar" id="avatarPerfil" aria-hidden="true"></span>
+                <span id="usuarioLogado"></span>
+                <svg class="profile-chevron" viewBox="0 0 16 16" aria-hidden="true"><path d="m3 6 5 5 5-5" /></svg>
+              </button>
+              <div class="profile-dropdown" id="menuPerfilDropdown" aria-hidden="true" inert>
+                <div class="profile-dropdown__identity">
+                  <strong id="perfilNome"></strong>
+                  <dl>
+                    <div><dt>Cargo</dt><dd id="perfilCargo"></dd></div>
+                    <div><dt>Setor</dt><dd id="perfilSetor"></dd></div>
+                  </dl>
+                </div>
+                <button id="sair" class="profile-logout" type="button">Sair</button>
+              </div>
+            </div>
         </header>
 
         <main class="item">

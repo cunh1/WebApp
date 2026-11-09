@@ -24,7 +24,7 @@ async function verificarSessao() {
             window.location.href = 'home.html';
             return;
         }
-        document.getElementById('usuarioLogado').textContent = usuarioAtual.nome;
+        window.configurarMenuPerfil(usuarioAtual);
         carregarUsuarios();
     } catch {
         window.location.href = 'inicial.html';
