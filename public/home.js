@@ -462,8 +462,33 @@ function configurarFiltroMenu(idMenu, tipo) {
         document.getElementById('Manutencao').setAttribute('aria-pressed', String(filtroTipoAtual === 'Manutenção'));
         document.getElementById('TI').setAttribute('aria-pressed', String(filtroTipoAtual === 'T.I'));
         carregarChamados();
+        fecharMenuMobile();
     });
 }
+
+const asideMenuMobile = document.getElementById('menuNavegacao');
+const alternarMenuMobile = document.getElementById('alternarMenuMobile');
+function fecharMenuMobile(devolverFoco = false) {
+    if (!asideMenuMobile || !alternarMenuMobile) return;
+    asideMenuMobile.classList.remove('nav-mobile-aberto');
+    alternarMenuMobile.setAttribute('aria-expanded', 'false');
+    if (devolverFoco) alternarMenuMobile.focus();
+}
+alternarMenuMobile.addEventListener('click', () => {
+    const aberto = alternarMenuMobile.getAttribute('aria-expanded') !== 'true';
+    asideMenuMobile.classList.toggle('nav-mobile-aberto', aberto);
+    alternarMenuMobile.setAttribute('aria-expanded', String(aberto));
+});
+document.addEventListener('click', (evento) => {
+    if (alternarMenuMobile.getAttribute('aria-expanded') === 'true' && !asideMenuMobile.contains(evento.target)) {
+        fecharMenuMobile();
+    }
+});
+document.addEventListener('keydown', (evento) => {
+    if (evento.key === 'Escape' && alternarMenuMobile.getAttribute('aria-expanded') === 'true') {
+        fecharMenuMobile(true);
+    }
+});
 configurarFiltroMenu('Manutencao', 'Manutenção');
 configurarFiltroMenu('TI', 'T.I');
 

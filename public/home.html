@@ -39,10 +39,17 @@
             </div>
           </header>
 
-          <aside class="item" aria-labelledby="menu">
-            <h2 id="menu">Menu</h2>
-            <button type="button" class="textM" id="Manutencao" aria-pressed="false">Manutenção</button>
-            <button type="button" class="textM" id="TI" aria-pressed="false">T.I</button>
+          <aside class="item" id="menuNavegacao" aria-label="Filtros de chamados">
+            <button type="button" class="mobile-nav-toggle" id="alternarMenuMobile" aria-expanded="false" aria-controls="opcoesMenuMobile">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" /></svg>
+              <span>Navegação</span>
+              <svg class="mobile-nav-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5" /></svg>
+            </button>
+            <div class="mobile-nav-options" id="opcoesMenuMobile">
+              <h2 id="menu">Filtrar chamados</h2>
+              <button type="button" class="textM" id="Manutencao" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M14.5 3.5a4 4 0 0 0-4.9 5L4 14.1 6 16l5.6-5.6a4 4 0 0 0 5-4.9l-2.4 2.3-2-2z" /></svg></span>Manutenção</button>
+              <button type="button" class="textM" id="TI" aria-pressed="false"><span class="mobile-nav-icon" aria-hidden="true"><svg viewBox="0 0 20 20"><path d="M3 4h14v10H3zM7 17h6m-3-3v3" /></svg></span>T.I</button>
+            </div>
           </aside>
 
           <article class="item" id="areaLista">
