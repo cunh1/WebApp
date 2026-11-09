@@ -70,6 +70,7 @@ const estadoVazioChamados = document.getElementById('estadoVazioChamados');
 let chamadoSelecionadoId = null;
 let filtroTipoAtual = null;
 let incluirCancelados = false;
+let chamadosCarregados = false;
 
 function formatarData(isoComoTexto) {
     if (!isoComoTexto) return { data: '—', hora: '—' };
@@ -208,7 +209,15 @@ async function abrirDetalhes(id, { atualizarUrl = true } = {}) {
     acoesLista.hidden = true;
     document.getElementById('container').classList.add('detalhes-abertos');
     areaDetalhes.hidden = false;
-    detalhesConteudo.innerHTML = '<div class="detalhes-carregando">Carregando informações do chamado…</div>';
+    if (!detalhesConteudo.querySelector('.detalhe-cabecalho')) {
+        detalhesConteudo.innerHTML = `<div class="detalhes-skeleton" role="status" aria-label="Carregando detalhes do chamado">
+          <div class="skeleton skeleton-title"></div><div class="skeleton skeleton-line skeleton-line--short"></div>
+          <div class="detalhes-grade"><div class="detalhes-principal">
+            <section class="detalhe-bloco skeleton-block"><div class="skeleton skeleton-heading"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line skeleton-line--short"></div></section>
+            <section class="detalhe-bloco skeleton-block"><div class="skeleton skeleton-heading"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line skeleton-line--medium"></div></section>
+          </div><aside class="detalhes-lateral"><section class="detalhe-bloco skeleton-block"><div class="skeleton skeleton-heading"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line"></div><div class="skeleton skeleton-line"></div></section></aside></div>
+        </div>`;
+    }
     detalheNumero.textContent = `Chamado #${idValido}`;
     if (atualizarUrl && window.location.hash !== `#chamado-${idValido}`) {
         history.pushState({ chamadoId: idValido }, '', `#chamado-${idValido}`);
@@ -400,12 +409,20 @@ async function carregarChamados() {
     if (filtroTipoAtual) params.set('tipo', filtroTipoAtual);
     if (incluirCancelados) params.set('incluirCancelados', '1');
     const url = `/chamados${params.toString() ? `?${params}` : ''}`;
+    if (!chamadosCarregados) {
+        corpoTabela.innerHTML = Array.from({ length: 5 }, (_, linha) => `<tr aria-hidden="true">${Array.from({ length: 12 }, (__, coluna) => `<td><span class="skeleton skeleton-cell skeleton-cell--${(linha + coluna) % 3}"></span></td>`).join('')}</tr>`).join('');
+        tabelaChamados.hidden = false;
+        tabelaChamados.setAttribute('aria-busy', 'true');
+        estadoVazioChamados.hidden = true;
+    }
     try {
         const resposta = await fetch(url, { credentials: 'include' });
         if (resposta.status === 401) return window.location.href = 'inicial.html';
         if (!resposta.ok) throw new Error('Falha ao listar chamados');
         const chamados = await resposta.json();
         corpoTabela.innerHTML = '';
+        chamadosCarregados = true;
+        tabelaChamados.removeAttribute('aria-busy');
         chamadoSelecionadoId = null;
         for (const chamado of chamados) corpoTabela.appendChild(desenharLinha(chamado));
         if (chamados.length === 0) {
@@ -425,6 +442,11 @@ async function carregarChamados() {
             estadoVazioChamados.hidden = true;
         }
     } catch (erro) {
+        if (!chamadosCarregados) {
+            corpoTabela.innerHTML = '';
+            tabelaChamados.hidden = true;
+            tabelaChamados.removeAttribute('aria-busy');
+        }
         window.showToast('Não foi possível carregar os chamados.', 'error');
         console.error(erro);
     }

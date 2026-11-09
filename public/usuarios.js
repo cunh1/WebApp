@@ -43,12 +43,15 @@ const corpoTabela = document.getElementById('corpoUsuarios');
 const tabela = document.getElementById('tabelaUsuarios');
 const carregando = document.getElementById('carregando');
 const listaVazia = document.getElementById('listaVazia');
+let usuariosCarregados = false;
 
 async function carregarUsuarios() {
     const termo = document.getElementById('busca').value.trim();
-    tabela.style.display = 'none';
-    listaVazia.hidden = true;
-    carregando.style.display = 'block';
+    if (!usuariosCarregados) {
+        tabela.style.display = 'none';
+        listaVazia.hidden = true;
+        carregando.style.display = 'block';
+    }
 
     try {
         const url = termo ? `/admin/usuarios?busca=${encodeURIComponent(termo)}` : '/admin/usuarios';
@@ -58,8 +61,10 @@ async function carregarUsuarios() {
         if (!resposta.ok) throw new Error('Falha ao carregar usuários');
 
         const lista = await resposta.json();
+        usuariosCarregados = true;
         carregando.style.display = 'none';
         if (!lista.length) {
+            tabela.style.display = 'none';
             const buscando = Boolean(termo);
             document.getElementById('listaVaziaTitulo').textContent = buscando
                 ? 'Nenhum usuário encontrado'
@@ -72,10 +77,11 @@ async function carregarUsuarios() {
             listaVazia.hidden = false;
             return;
         }
+        listaVazia.hidden = true;
         corpoTabela.innerHTML = lista.map(desenharLinha).join('');
         tabela.style.display = 'table';
     } catch (erro) {
-        carregando.style.display = 'none';
+        if (!usuariosCarregados) carregando.style.display = 'none';
         mostrarMensagem(erro.message, 'erro');
     }
 }

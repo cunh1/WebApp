@@ -46,7 +46,14 @@
             </div>
 
             <div id="mensagem" role="status" aria-live="polite"></div>
-            <div id="carregando" role="status">Carregando usuários...</div>
+            <div id="carregando" class="users-skeleton" role="status" aria-label="Carregando usuários">
+                <div class="users-skeleton__row users-skeleton__row--head" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+                <div class="users-skeleton__row" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+                <div class="users-skeleton__row" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+                <div class="users-skeleton__row" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+                <div class="users-skeleton__row" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+                <div class="users-skeleton__row" aria-hidden="true"><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span><span class="skeleton"></span></div>
+            </div>
 
             <table id="tabelaUsuarios" aria-label="Lista de usuários">
                 <thead>
