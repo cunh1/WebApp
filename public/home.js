@@ -71,6 +71,8 @@ let chamadoSelecionadoId = null;
 let filtroTipoAtual = null;
 let incluirCancelados = false;
 let chamadosCarregados = false;
+let chamadosDisponiveis = [];
+let cacheIncluiCancelados = false;
 
 function formatarData(isoComoTexto) {
     if (!isoComoTexto) return { data: '—', hora: '—' };
@@ -406,8 +408,8 @@ function selecionarLinha(id) {
 
 async function carregarChamados() {
     const params = new URLSearchParams();
-    if (filtroTipoAtual) params.set('tipo', filtroTipoAtual);
-    if (incluirCancelados) params.set('incluirCancelados', '1');
+    const buscarCancelados = incluirCancelados || document.getElementById('filtroStatus').value === 'cancelado';
+    if (buscarCancelados) params.set('incluirCancelados', '1');
     const url = `/chamados${params.toString() ? `?${params}` : ''}`;
     if (!chamadosCarregados) {
         corpoTabela.innerHTML = Array.from({ length: 5 }, (_, linha) => `<tr aria-hidden="true">${Array.from({ length: 12 }, (__, coluna) => `<td><span class="skeleton skeleton-cell skeleton-cell--${(linha + coluna) % 3}"></span></td>`).join('')}</tr>`).join('');
@@ -420,27 +422,13 @@ async function carregarChamados() {
         if (resposta.status === 401) return window.location.href = 'inicial.html';
         if (!resposta.ok) throw new Error('Falha ao listar chamados');
         const chamados = await resposta.json();
-        corpoTabela.innerHTML = '';
         chamadosCarregados = true;
+        chamadosDisponiveis = chamados;
+        cacheIncluiCancelados = buscarCancelados;
         tabelaChamados.removeAttribute('aria-busy');
         chamadoSelecionadoId = null;
-        for (const chamado of chamados) corpoTabela.appendChild(desenharLinha(chamado));
-        if (chamados.length === 0) {
-            const haFiltros = Boolean(filtroTipoAtual || incluirCancelados);
-            tabelaChamados.hidden = true;
-            estadoVazioChamados.hidden = false;
-            document.getElementById('estadoVazioChamadosTitulo').textContent = haFiltros
-                ? 'Nenhum chamado encontrado para esta visualização'
-                : 'Nenhum chamado cadastrado';
-            document.getElementById('estadoVazioChamadosTexto').textContent = haFiltros
-                ? 'Não há chamados que correspondam ao setor ou à visualização selecionada. Limpe os filtros para ver todos.'
-                : 'Quando um chamado for criado, ele aparecerá nesta lista.';
-            document.getElementById('criarChamadoVazio').hidden = haFiltros;
-            document.getElementById('limparFiltrosChamados').hidden = !haFiltros;
-        } else {
-            tabelaChamados.hidden = false;
-            estadoVazioChamados.hidden = true;
-        }
+        atualizarOpcoesAtendentes();
+        aplicarFiltrosChamados();
     } catch (erro) {
         if (!chamadosCarregados) {
             corpoTabela.innerHTML = '';
@@ -452,6 +440,96 @@ async function carregarChamados() {
     }
 }
 
+function normalizarPesquisa(valor) {
+    return String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR').trim();
+}
+
+function dataLocalChamado(valor) {
+    if (!valor) return '';
+    const normalizado = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(valor) ? valor : `${String(valor).replace(' ', 'T')}Z`;
+    const instante = new Date(normalizado);
+    if (Number.isNaN(instante.getTime())) return '';
+    const partes = new Intl.DateTimeFormat('en-CA', { timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(instante);
+    const mapa = Object.fromEntries(partes.map(parte => [parte.type, parte.value]));
+    return `${mapa.year}-${mapa.month}-${mapa.day}`;
+}
+
+function atualizarOpcoesAtendentes() {
+    const select = document.getElementById('filtroAtendente');
+    const selecionado = select.value;
+    const atendentes = new Map();
+    for (const chamado of chamadosDisponiveis) {
+        if (chamado.atendente?.id != null) atendentes.set(String(chamado.atendente.id), chamado.atendente.nome || `Atendente #${chamado.atendente.id}`);
+    }
+    select.replaceChildren(new Option('Todos os atendentes', ''));
+    for (const [id, nome] of [...atendentes].sort((a, b) => a[1].localeCompare(b[1], 'pt-BR'))) select.add(new Option(nome, id));
+    select.add(new Option('Sem atendente', '__none__'));
+    if ([...select.options].some(opcao => opcao.value === selecionado)) select.value = selecionado;
+}
+
+function aplicarFiltrosChamados() {
+    if (!chamadosCarregados) return;
+    const pesquisa = normalizarPesquisa(document.getElementById('pesquisaChamados').value);
+    const status = document.getElementById('filtroStatus').value;
+    const atendente = document.getElementById('filtroAtendente').value;
+    const inicio = document.getElementById('filtroDataInicio').value;
+    const fim = document.getElementById('filtroDataFim').value;
+    const setor = filtroTipoAtual === 'T.I' ? 'TI' : filtroTipoAtual;
+    const chamados = chamadosDisponiveis.filter(chamado => {
+        const nomeUsuario = normalizarPesquisa(chamado.usuario?.nome);
+        const textoPesquisa = !pesquisa || String(chamado.id).includes(pesquisa) || nomeUsuario.includes(pesquisa);
+        const data = dataLocalChamado(chamado.criadoEm);
+        const correspondeSetor = !setor || (chamado.setorResponsavel || chamado.tipo) === setor;
+        const correspondeAtendente = !atendente || (atendente === '__none__' ? !chamado.atendente : String(chamado.atendente?.id) === atendente);
+        return textoPesquisa && correspondeSetor && (!status || chamado.status === status) && correspondeAtendente &&
+            (!inicio || (data && data >= inicio)) && (!fim || (data && data <= fim));
+    });
+    corpoTabela.replaceChildren(...chamados.map(desenharLinha));
+    const filtros = [];
+    if (pesquisa) filtros.push(`Pesquisa: ${document.getElementById('pesquisaChamados').value.trim()}`);
+    if (setor) filtros.push(`Setor: ${filtroTipoAtual}`);
+    if (status) filtros.push(`Status: ${rotuloStatus(status)}`);
+    if (atendente) filtros.push(`Atendente: ${atendente === '__none__' ? 'Sem atendente' : document.getElementById('filtroAtendente').selectedOptions[0]?.textContent}`);
+    if (inicio) filtros.push(`A partir de: ${inicio.split('-').reverse().join('/')}`);
+    if (fim) filtros.push(`Até: ${fim.split('-').reverse().join('/')}`);
+    if (incluirCancelados) filtros.push('Cancelados incluídos');
+    const ativo = filtros.length > 0;
+    const limpar = document.getElementById('limparTodosFiltros');
+    limpar.disabled = !ativo;
+    const chips = document.getElementById('filtrosAtivos');
+    chips.replaceChildren(...filtros.map(texto => { const chip = document.createElement('span'); chip.className = 'filter-chip'; chip.textContent = texto; return chip; }));
+    const quantidade = chamados.length;
+    document.getElementById('resumoChamados').textContent = `${quantidade} ${quantidade === 1 ? 'chamado encontrado' : 'chamados encontrados'}`;
+    if (quantidade) {
+        tabelaChamados.hidden = false;
+        estadoVazioChamados.hidden = true;
+    } else {
+        tabelaChamados.hidden = true;
+        estadoVazioChamados.hidden = false;
+        document.getElementById('estadoVazioChamadosTitulo').textContent = ativo ? 'Nenhum chamado encontrado' : 'Nenhum chamado cadastrado';
+        document.getElementById('estadoVazioChamadosTexto').textContent = ativo
+            ? 'Ajuste ou limpe os filtros para ver outros chamados.'
+            : 'Quando um chamado for criado, ele aparecerá nesta lista.';
+        document.getElementById('criarChamadoVazio').hidden = ativo;
+        document.getElementById('limparFiltrosChamados').hidden = !ativo;
+    }
+}
+
+function limparFiltrosChamados() {
+    filtroTipoAtual = null;
+    incluirCancelados = false;
+    document.getElementById('pesquisaChamados').value = '';
+    document.getElementById('filtroStatus').value = '';
+    document.getElementById('filtroAtendente').value = '';
+    document.getElementById('filtroDataInicio').value = '';
+    document.getElementById('filtroDataFim').value = '';
+    for (const id of ['Manutencao', 'TI']) {
+        document.getElementById(id).classList.remove('ativo');
+        document.getElementById(id).setAttribute('aria-pressed', 'false');
+    }
+    botaoCancelados.textContent = 'Ver cancelados';
+}
+
 // Menu lateral: filtra a lista por tipo (clicar de novo no mesmo item remove o filtro).
 function configurarFiltroMenu(idMenu, tipo) {
     const el = document.getElementById(idMenu);
@@ -461,7 +539,7 @@ function configurarFiltroMenu(idMenu, tipo) {
         document.getElementById('TI').classList.toggle('ativo', filtroTipoAtual === 'T.I');
         document.getElementById('Manutencao').setAttribute('aria-pressed', String(filtroTipoAtual === 'Manutenção'));
         document.getElementById('TI').setAttribute('aria-pressed', String(filtroTipoAtual === 'T.I'));
-        carregarChamados();
+        aplicarFiltrosChamados();
         fecharMenuMobile();
     });
 }
@@ -503,14 +581,19 @@ document.getElementById('criarChamadoVazio').addEventListener('click', () => {
     document.getElementById('incluir').click();
 });
 document.getElementById('limparFiltrosChamados').addEventListener('click', async () => {
-    filtroTipoAtual = null;
-    incluirCancelados = false;
-    document.getElementById('Manutencao').classList.remove('ativo');
-    document.getElementById('TI').classList.remove('ativo');
-    document.getElementById('Manutencao').setAttribute('aria-pressed', 'false');
-    document.getElementById('TI').setAttribute('aria-pressed', 'false');
-    botaoCancelados.textContent = 'Ver cancelados';
+    limparFiltrosChamados();
     await carregarChamados();
+});
+
+document.getElementById('limparTodosFiltros').addEventListener('click', async () => {
+    limparFiltrosChamados();
+    await carregarChamados();
+});
+document.getElementById('pesquisaChamados').addEventListener('input', aplicarFiltrosChamados);
+for (const id of ['filtroAtendente', 'filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
+document.getElementById('filtroStatus').addEventListener('change', () => {
+    if (document.getElementById('filtroStatus').value === 'cancelado' && !cacheIncluiCancelados) carregarChamados();
+    else aplicarFiltrosChamados();
 });
 
 // ---------------------------------------------------------------------------------------
