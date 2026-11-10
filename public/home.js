@@ -74,7 +74,7 @@ let chamadosCarregados = false;
 let chamadosDisponiveis = [];
 let cacheIncluiCancelados = false;
 
-function formatarData(isoComoTexto) {
+function formatarData(isoComoTexto, incluirSegundos = false) {
     if (!isoComoTexto) return { data: '—', hora: '—' };
     // O banco mantém timestamps UTC em formato SQL sem sufixo de fuso.
     const normalizado = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(isoComoTexto)
@@ -82,7 +82,9 @@ function formatarData(isoComoTexto) {
     const instante = new Date(normalizado);
     if (Number.isNaN(instante.getTime())) return { data: '—', hora: '—' };
     const data = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', year: 'numeric' }).format(instante);
-    const hora = new Intl.DateTimeFormat('pt-BR', { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hour12: false }).format(instante);
+    const opcoesHora = { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit', hour12: false };
+    if (incluirSegundos) opcoesHora.second = '2-digit';
+    const hora = new Intl.DateTimeFormat('pt-BR', opcoesHora).format(instante);
     return { data, hora };
 }
 
@@ -106,9 +108,9 @@ function rotuloStatus(status) {
     return ({ aberto: 'Aberto', em_andamento: 'Em andamento', fechado: 'Fechado', cancelado: 'Cancelado' })[status] || status || 'Não informado';
 }
 
-function dataCompleta(valor) {
+function dataCompleta(valor, incluirSegundos = false) {
     if (!valor) return '—';
-    const data = formatarData(valor);
+    const data = formatarData(valor, incluirSegundos);
     return data.hora === '—' ? data.data : `${data.data} às ${data.hora}`;
 }
 
@@ -168,12 +170,9 @@ function renderizarDetalhes(chamado) {
           <section class="detalhe-bloco">
             <h2>Informações do chamado</h2>
             <dl class="detalhe-lista">
-              <div><dt>Identificador</dt><dd>#${escapar(chamado.id)}</dd></div>
               <div><dt>Tipo</dt><dd>${escapar(chamado.tipo || '—')}</dd></div>
               <div><dt>Setor responsável</dt><dd>${escapar(chamado.setorResponsavel || 'Sem classificação')}</dd></div>
               <div><dt>Status</dt><dd>${escapar(rotuloStatus(chamado.status))}</dd></div>
-              <div><dt>Prioridade</dt><dd>Não definida</dd></div>
-              <div><dt>Restrito</dt><dd>${chamado.restrito ? 'Sim' : 'Não'}</dd></div>
             </dl>
           </section>
           <section class="detalhe-bloco">
@@ -188,13 +187,12 @@ function renderizarDetalhes(chamado) {
             <dl class="detalhe-lista">
               <div><dt>Abertura</dt><dd>${escapar(dataCompleta(chamado.criadoEm))}</dd></div>
               <div><dt>Última atualização</dt><dd>${escapar(dataCompleta(chamado.atualizadoEm))}</dd></div>
-              <div><dt>Fechamento</dt><dd>${escapar(dataCompleta(chamado.fechadoEm))}</dd></div>
             </dl>
           </section>
         </aside>
       </div>
-      ${chamado.cancelado ? `<section class="detalhe-bloco"><h2>Chamado cancelado</h2><p class="texto-completo"><strong>Motivo:</strong> ${escapar(chamado.motivoCancelamento || 'Motivo não informado')}</p><p>Cancelado por: ${escapar(chamado.canceladoPor?.nome || 'Usuário não disponível')} · ${escapar(dataCompleta(chamado.canceladoEm))}</p></section>` : ''}
-      ${chamado.status === 'fechado' ? `<section class="detalhe-bloco"><h2>Solução / registro de encerramento</h2><p class="texto-completo">${escapar(chamado.solucaoFechamento || 'Não foi registrada uma solução.')}</p><p>Fechado por: <strong>${escapar(chamado.fechadoPor?.nome || 'Usuário não disponível')}</strong></p><p>Data do fechamento: ${escapar(dataCompleta(chamado.fechadoEm))}</p></section>` : ''}
+      ${chamado.cancelado ? `<section class="detalhe-bloco"><h2>Chamado cancelado</h2><p class="texto-completo"><strong>Motivo:</strong> ${escapar(chamado.motivoCancelamento || 'Motivo não informado')}</p><p>Cancelado por: ${escapar(chamado.canceladoPor?.nome || 'Usuário não disponível')} · ${escapar(dataCompleta(chamado.canceladoEm, true))}</p></section>` : ''}
+      ${chamado.status === 'fechado' && !chamado.cancelado ? `<section class="detalhe-bloco"><h2>Solução / registro de encerramento</h2><p class="texto-completo">${escapar(chamado.solucaoFechamento || 'Não foi registrada uma solução.')}</p><p>Fechado por: <strong>${escapar(chamado.fechadoPor?.nome || 'Usuário não disponível')}</strong></p><p>Fechado em: ${escapar(dataCompleta(chamado.fechadoEm, true))}</p></section>` : ''}
       ${!chamado.cancelado && (podeEditarChamado(chamado) || podeExcluirChamado(chamado) || (chamado.status !== 'fechado' && podeOperarSetor(chamado))) ? `<div class="detalhes-acoes">
         ${podeEditarChamado(chamado) ? `<button type="button" class="button" id="detalheAlterar">Alterar chamado</button>` : ''}
         ${podeExcluirChamado(chamado) ? `<button type="button" class="button botao-excluir" id="detalheExcluirDefinitivo">🗑 Excluir chamado</button>` : ''}
@@ -340,7 +338,7 @@ detalhesConteudo.addEventListener('click', async (evento) => {
 
 function desenharLinha(chamado) {
     const abertura = formatarData(chamado.criadoEm);
-    const fechamento = formatarData(chamado.fechadoEm);
+    const fechamento = formatarData(chamado.fechadoEm, true);
     const tr = document.createElement('tr');
     tr.dataset.id = chamado.id;
     if (chamado.id === chamadoSelecionadoId) tr.classList.add('selecionada');

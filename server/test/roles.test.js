@@ -78,6 +78,11 @@ test('fechamento exige solução e só administrador ou setor correspondente pod
   const fechado=await ti.cli.put(`/chamados/${ct.data.id}`,{status:'fechado',solucao:'Mouse substituído'});
   assert.equal(fechado.status,200); assert.equal(fechado.data.solucaoFechamento,'Mouse substituído');
   assert.equal(fechado.data.fechadoPor.nome,ti.nome); assert.ok(fechado.data.fechadoEm);
+  const registroFechado=db.prepare('SELECT status, fechado_em, fechado_por_id, cancelado_em, cancelado_por_id FROM chamados WHERE id=?').get(ct.data.id);
+  assert.equal(registroFechado.status,'fechado'); assert.ok(registroFechado.fechado_em); assert.equal(registroFechado.fechado_por_id,ti.id);
+  assert.equal(registroFechado.cancelado_em,null); assert.equal(registroFechado.cancelado_por_id,null);
+  const recarregado=await comum.cli.get(`/chamados/${ct.data.id}`);
+  assert.equal(recarregado.data.fechadoPor.id,ti.id); assert.equal(recarregado.data.fechadoEm,fechado.data.fechadoEm);
   assert.ok((await comum.cli.get('/chamados')).data.some(c=>c.id===ct.data.id));
   assert.equal((await manut.cli.put(`/chamados/${cm.data.id}`,{status:'fechado',solucao:'Peça trocada'})).status,200);
   const adminClose=await admin.cli.put(`/chamados/${ct.data.id}`,{status:'fechado',solucao:'Atualização administrativa'});
@@ -93,6 +98,9 @@ test('cancelamento exige motivo, preserva histórico e apenas admin/setor corres
   const detalhe=await comum.cli.get(`/chamados/${ct.data.id}`);
   assert.equal(detalhe.status,200); assert.equal(detalhe.data.cancelado,true);
   assert.equal(detalhe.data.motivoCancelamento,'duplicado'); assert.equal(detalhe.data.canceladoPor.nome,ti.nome); assert.ok(detalhe.data.canceladoEm);
+  const registroCancelado=db.prepare('SELECT status, fechado_em, fechado_por_id, cancelado_em, cancelado_por_id FROM chamados WHERE id=?').get(ct.data.id);
+  assert.equal(registroCancelado.status,'aberto'); assert.equal(registroCancelado.fechado_em,null); assert.equal(registroCancelado.fechado_por_id,null);
+  assert.ok(registroCancelado.cancelado_em); assert.equal(registroCancelado.cancelado_por_id,ti.id);
   assert.equal((await comum.cli.put(`/chamados/${ct.data.id}`,{descricao:'não pode'})).status,409);
   assert.ok(!(await comum.cli.get('/chamados')).data.some(c=>c.id===ct.data.id));
   assert.ok((await comum.cli.get('/chamados?incluirCancelados=1')).data.some(c=>c.id===ct.data.id));
