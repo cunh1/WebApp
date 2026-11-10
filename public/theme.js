@@ -1,4 +1,4 @@
-ou (() => {
+(() => {
   const STORAGE_KEY = 'webapp.theme';
   const root = document.documentElement;
   const allowedThemes = ['light', 'dark'];
