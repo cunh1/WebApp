@@ -405,6 +405,7 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
 :root[data-theme="dark"] #areaDetalhes { background: #182336; color: var(--ink); }
 :root[data-theme="dark"] #chamados th,
 :root[data-theme="dark"] #tabelaUsuarios th { background: #29364d; color: #d6def0; }
+:root[data-theme="dark"] #tabelaUsuarios { background-color: var(--paper); }
 :root[data-theme="dark"] #chamados td,
 :root[data-theme="dark"] #tabelaUsuarios td { color: var(--ink); border-bottom-color: var(--line); }
 :root[data-theme="dark"] #chamados tbody tr:hover,
