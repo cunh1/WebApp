@@ -269,10 +269,20 @@ document.getElementById('btnConfirmar').addEventListener('click', async function
         }
         if (!resposta.ok && resposta.status !== 204) {
             const dados = await resposta.json().catch(() => ({}));
-            throw new Error(dados.erro || 'Não foi possível concluir a ação');
+            const mensagensErro = {
+                ativar: 'Não foi possível ativar o usuário.',
+                desativar: 'Não foi possível desativar o usuário.',
+                excluir: 'Não foi possível excluir o usuário.',
+            };
+            throw new Error(dados.erro || mensagensErro[acao]);
         }
         overlay.classList.remove('ativo');
-        mostrarMensagem(acao === 'excluir' ? 'Usuário e chamados associados excluídos com sucesso.' : 'Feito.', 'sucesso');
+        const mensagensSucesso = {
+            ativar: 'Usuário ativado com sucesso.',
+            desativar: 'Usuário desativado com sucesso.',
+            excluir: 'Usuário e chamados associados excluídos com sucesso.',
+        };
+        mostrarMensagem(mensagensSucesso[acao], 'sucesso');
         await carregarUsuarios();
     } catch (erro) {
         mostrarMensagem(erro.message, 'erro');
