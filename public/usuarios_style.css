@@ -90,6 +90,7 @@ main {
     gap: 10px;
     margin-bottom: 14px;
     flex-wrap: wrap;
+    color: whiteX
 }
 
 #busca {

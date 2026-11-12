@@ -308,6 +308,9 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
 
 /* Menu de perfil compartilhado no cabeçalho */
 .profile-menu { position: relative; flex: 0 0 auto; margin-left: 0; }
+/* Mantém o perfil no mesmo ponto do cabeçalho, com ou sem o link de administração. */
+header:has(#linkUsuarios) #linkUsuarios { margin-left: 0; }
+header:has(#linkUsuarios) .profile-menu { margin-left: auto; }
 .profile-trigger {
   display: flex; align-items: center; gap: 9px; max-width: 250px; min-height: 44px; padding: 5px 9px;
   border: 1px solid #ffffff55; border-radius: 12px; background: #ffffff18; color: #fff; cursor: pointer;
