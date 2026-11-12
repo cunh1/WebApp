@@ -102,19 +102,16 @@
                 <input type="password" id="campoSenha" class="text" autocomplete="new-password" aria-describedby="dicaSenha">
                 <small id="dicaSenha">Mínimo de 8 caracteres.</small>
 
-                <label class="rotulo" for="campoPapel">Nível de acesso</label>
-                <select id="campoPapel" class="text">
-                    <option value="usuario">Usuário comum</option>
-                    <option value="ti">TI</option>
-                    <option value="manutencao">Manutenção</option>
-                    <option value="admin">Administrador</option>
-                </select>
-                <label class="rotulo" for="campoSetor">Setor (para usuário comum/administrador)</label>
+                <label class="rotulo" for="campoSetor">Setor</label>
                 <select id="campoSetor" class="text">
-                    <option value="">Não definido</option>
+                    <option value="">Sem setor — usuário para abertura de chamados</option>
                     <option value="TI">TI</option>
                     <option value="Manutenção">Manutenção</option>
                 </select>
+                <label class="admin-role-option" for="campoAdministrador">
+                    <input type="checkbox" id="campoAdministrador">
+                    <span><strong>Administrador</strong><small>Concede acesso administrativo ao sistema.</small></span>
+                </label>
                 <div id="erroForm" role="alert"></div>
 
                 <div class="modal-botoes">

@@ -14,9 +14,13 @@ function validarCampos(c, { senhaObrigatoria }) {
   if (senhaObrigatoria || c.nome !== undefined) { if (!nome) erros.push('nome é obrigatório'); else if (nome.length > 120) erros.push('nome muito longo (máx. 120 caracteres)'); }
   if (senhaObrigatoria || c.login !== undefined) { if (!login) erros.push('login é obrigatório'); else if (login.length > 60) erros.push('login muito longo (máx. 60 caracteres)'); }
   if (senhaObrigatoria || c.senha !== undefined) erros.push(...validarSenha(c.senha));
-  const cargo = c.cargo ?? c.papel;
-  if (cargo !== undefined && !CARGOS.includes(cargo)) erros.push(`cargo deve ser um de: ${CARGOS.join(', ')}`);
+  let cargo = c.cargo ?? c.papel;
   let setor = c.setor;
+  if (c.administrador !== undefined) {
+    if (typeof c.administrador !== 'boolean') erros.push('administrador deve ser verdadeiro ou falso');
+    else cargo = c.administrador ? 'admin' : setor === 'TI' ? 'ti' : setor === 'Manutenção' ? 'manutencao' : 'usuario';
+  } else if (cargo === undefined && setor !== undefined) cargo = setor === 'TI' ? 'ti' : setor === 'Manutenção' ? 'manutencao' : 'usuario';
+  if (cargo !== undefined && !CARGOS.includes(cargo)) erros.push(`cargo deve ser um de: ${CARGOS.join(', ')}`);
   if (cargo === 'ti') setor = 'TI';
   if (cargo === 'manutencao') setor = 'Manutenção';
   if ((setor !== undefined && setor !== null && !['TI', 'Manutenção'].includes(setor))) erros.push('setor inválido');
@@ -34,7 +38,7 @@ router.post('/usuarios', async (req, res) => {
   if (usuarios.buscarPorLogin(v.login)) return res.status(409).json({ erro: 'Já existe uma conta com esse login' });
   const senhaHash = await hashSenha(c.senha);
   const cargo = v.cargo || 'usuario';
-  const setor = cargo === 'ti' ? 'TI' : cargo === 'manutencao' ? 'Manutenção' : (v.setor ?? null);
+  const setor = v.setor ?? null;
   const criado = usuarios.criar({ nome: v.nome, login: v.login, senhaHash, cargo, papel: cargo, setor });
   res.status(201).json(usuarios.paraPublico(criado));
 });
@@ -47,11 +51,12 @@ router.put('/usuarios/:id', async (req, res) => {
   const cargoNovo = v.cargo ?? alvo.cargo ?? alvo.papel;
   if (alvo.cargo === 'admin' && cargoNovo !== 'admin' && usuarios.contarAdmins() <= 1) return res.status(409).json({ erro: 'Não é possível remover o último administrador do sistema' });
   const senhaHash = c.senha !== undefined ? await hashSenha(c.senha) : undefined;
-  const setor = cargoNovo === 'ti' ? 'TI' : cargoNovo === 'manutencao' ? 'Manutenção' : (c.setor !== undefined ? v.setor : (c.cargo !== undefined || c.papel !== undefined ? null : alvo.setor));
+  const mudouAcesso = c.administrador !== undefined || c.setor !== undefined || c.cargo !== undefined || c.papel !== undefined;
+  const setor = cargoNovo === 'ti' ? 'TI' : cargoNovo === 'manutencao' ? 'Manutenção' : (mudouAcesso ? (v.setor ?? null) : alvo.setor);
   const atualizado = usuarios.atualizar(id, {
     nome: c.nome !== undefined ? v.nome : undefined, login: c.login !== undefined ? v.login : undefined,
-    senhaHash, cargo: c.cargo !== undefined || c.papel !== undefined ? cargoNovo : undefined,
-    setor: c.setor !== undefined || c.cargo !== undefined || c.papel !== undefined ? setor : undefined,
+    senhaHash, cargo: mudouAcesso ? cargoNovo : undefined,
+    setor: mudouAcesso ? setor : undefined,
   });
   res.json(usuarios.paraPublico(atualizado));
 });

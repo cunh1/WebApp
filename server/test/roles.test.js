@@ -55,13 +55,13 @@ test('todos os cargos podem criar chamados para qualquer setor e visualizar ambo
   }
 });
 
-test('somente autor ou admin edita chamado aberto; não pode editar fechado/cancelado', async () => {
+test('usuário sem setor só abre chamados; operadores e admins mantêm os fluxos de edição', async () => {
   const admin=await usuario('admin'), autor=await usuario('usuario'), outro=await usuario('usuario'), ti=await usuario('ti');
   const criado=await autor.cli.post('/chamados',novoChamado('TI'));
   assert.equal(criado.status,201);
   assert.equal((await outro.cli.put(`/chamados/${criado.data.id}`,{descricao:'invasão'})).status,403);
   assert.equal((await ti.cli.put(`/chamados/${criado.data.id}`,{descricao:'edição operacional'})).status,403);
-  assert.equal((await autor.cli.put(`/chamados/${criado.data.id}`,{descricao:'minha edição'})).status,200);
+  assert.equal((await autor.cli.put(`/chamados/${criado.data.id}`,{descricao:'minha edição'})).status,403);
   assert.equal((await admin.cli.put(`/chamados/${criado.data.id}`,{descricao:'edição admin'})).status,200);
   const fechado=await ti.cli.put(`/chamados/${criado.data.id}`,{status:'fechado',solucao:'Ajuste realizado'});
   assert.equal(fechado.status,200);
@@ -129,22 +129,24 @@ test('somente administrador gerencia usuários', async () => {
 test('edição do autor funciona em chamado legado sem setor_responsavel e mantém campos não alterados', async () => {
   const autor = await usuario('usuario');
   const outro = await usuario('usuario');
+  const admin = await usuario('admin');
   const info = db.prepare("INSERT INTO chamados (usuario_id, descricao, tipo, setor_responsavel, evento, solicitacao) VALUES (?, 'Legado', 'T.I', NULL, 'evento antigo', 'texto antigo')").run(autor.id);
   const id = Number(info.lastInsertRowid);
   const tentativaOutro = await outro.cli.put(`/chamados/${id}`, { descricao: 'tentativa indevida', tipo: 'T.I', setorResponsavel: 'TI' });
   assert.equal(tentativaOutro.status, 403);
-  const edicao = await autor.cli.put(`/chamados/${id}`, { descricao: 'Legado editado', tipo: 'T.I', setorResponsavel: 'TI' });
+  assert.equal((await autor.cli.put(`/chamados/${id}`, { descricao: 'Não permitido', tipo: 'T.I', setorResponsavel: 'TI' })).status, 403);
+  const edicao = await admin.cli.put(`/chamados/${id}`, { descricao: 'Legado editado', tipo: 'T.I', setorResponsavel: 'TI' });
   assert.equal(edicao.status, 200, JSON.stringify(edicao.data));
   assert.equal(edicao.data.descricao, 'Legado editado');
   assert.equal(edicao.data.evento, 'evento antigo');
   assert.equal(edicao.data.solicitacao, 'texto antigo');
   assert.equal(edicao.data.setorResponsavel, 'TI');
-  assert.equal((await autor.cli.get(`/chamados/${id}`)).data.descricao, 'Legado editado');
+  assert.equal((await admin.cli.get(`/chamados/${id}`)).data.descricao, 'Legado editado');
 });
 
 test('edição parcial preserva campos opcionais e autor; autor e admin podem editar, outro usuário não', async () => {
   const admin = await usuario('admin');
-  const autor = await usuario('usuario');
+  const autor = await usuario('ti');
   const outro = await usuario('usuario');
   const criado = await autor.cli.post('/chamados', { ...novoChamado('TI'), evento: '2', solicitacao: 'Solicitação original' });
   assert.equal(criado.status, 201);
@@ -184,7 +186,7 @@ test('edição mantém a restrição para chamados em andamento, fechados e canc
 });
 
 test('edição preserva anexos não enviados, substitui ou remove só quando solicitado e limpa upload se o SQL falhar', async () => {
-  const autor = await usuario('usuario');
+  const autor = await usuario('ti');
   const png = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
   const criado = await autor.cli.post('/chamados', { ...novoChamado('Manutenção'), imagem1: png, imagem2: png });
   assert.equal(criado.status, 201);
@@ -222,7 +224,7 @@ test('edição preserva anexos não enviados, substitui ou remove só quando sol
 
 test('exclusão definitiva: somente o autor pode excluir, independentemente do cargo; fechado preserva histórico', async () => {
   const admin = await usuario('admin');
-  const autor = await usuario('usuario');
+  const autor = await usuario('ti');
   const outro = await usuario('usuario');
   const criado = await autor.cli.post('/chamados', novoChamado('TI', 'Chamado para excluir'));
   assert.equal(criado.status, 201);

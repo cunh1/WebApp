@@ -158,8 +158,9 @@ window.abrirEdicao = async function(id) {
         document.getElementById('tituloForm').textContent = 'Editar usuário';
         document.getElementById('campoNome').value = usuario.nome;
         document.getElementById('campoLogin').value = usuario.login;
-        document.getElementById('campoPapel').value = usuario.cargo || usuario.papel;
-        document.getElementById('campoSetor').value = usuario.setor || '';
+        const cargo = usuario.cargo || usuario.papel;
+        document.getElementById('campoAdministrador').checked = cargo === 'admin';
+        document.getElementById('campoSetor').value = usuario.setor || (cargo === 'ti' ? 'TI' : cargo === 'manutencao' ? 'Manutenção' : '');
         document.getElementById('campoSenha').value = '';
         document.getElementById('campoSenha').required = false;
         document.getElementById('rotuloSenha').textContent = 'Nova senha';
@@ -182,11 +183,9 @@ formUsuario.addEventListener('submit', async function(evento) {
     const dados = {
         nome: document.getElementById('campoNome').value.trim(),
         login: document.getElementById('campoLogin').value.trim(),
-        papel: document.getElementById('campoPapel').value,
+        administrador: document.getElementById('campoAdministrador').checked,
+        setor: document.getElementById('campoSetor').value || null,
     };
-    dados.cargo = dados.papel;
-    dados.setor = document.getElementById('campoSetor').value || null;
-    delete dados.papel;
     const senha = document.getElementById('campoSenha').value;
     if (senha || usuarioEmEdicaoId === null) dados.senha = senha;
 

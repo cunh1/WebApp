@@ -127,6 +127,18 @@ body:has(.card) { min-height: 100vh; padding: 20px; background: radial-gradient(
 #formUsuario { display: grid; gap: 9px; }
 #formUsuario .rotulo { margin-top: 6px; color: #4c5870; font-size: 13px; font-weight: 650; }
 #formUsuario .text { width: 100%; }
+#formUsuario .admin-role-option {
+  display: flex; align-items: center; gap: 11px; min-height: 64px; padding: 11px 13px;
+  border: 1px solid var(--line); border-radius: 11px; background: var(--canvas); color: var(--ink); cursor: pointer;
+}
+#formUsuario .admin-role-option input[type="checkbox"] {
+  appearance: auto; -webkit-appearance: checkbox; width: 18px; height: 18px; min-height: 18px;
+  flex: 0 0 auto; margin: 0; accent-color: var(--brand); cursor: pointer;
+}
+.admin-role-option span { display: grid; gap: 3px; }
+.admin-role-option strong { font-size: 14px; }
+.admin-role-option small { color: var(--muted); font-size: 12px; line-height: 1.4; }
+:root[data-theme="dark"] #formUsuario .admin-role-option { border-color: var(--line); background: #182336; }
 #erroForm { color: var(--danger); line-height: 1.45; }
 #listaVazia, #carregando { color: var(--muted); }
 #listaVazia[hidden], #estadoVazioChamados[hidden], .empty-state [hidden] { display: none; }

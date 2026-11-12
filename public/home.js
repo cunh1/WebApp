@@ -123,13 +123,13 @@ function podeOperarSetor(chamado) {
 }
 function podeEditarChamado(chamado) {
     return Boolean(usuarioAtual && !chamado.cancelado && chamado.status === 'aberto' &&
-        (usuarioAtual.papel === 'admin' || chamado.usuario?.id === usuarioAtual.id));
+        (usuarioAtual.papel === 'admin' || (['ti', 'manutencao'].includes(usuarioAtual.papel) && chamado.usuario?.id === usuarioAtual.id)));
 }
 
 function podeExcluirChamado(chamado) {
-    // A exclusão é exclusiva de quem abriu o chamado, sem exceção por cargo/setor.
+    // Usuários sem setor podem abrir chamados, mas ações de manutenção exigem perfil setorial/admin.
     return Boolean(usuarioAtual && !chamado.cancelado && chamado.status === 'aberto' &&
-        chamado.usuario?.id === usuarioAtual.id);
+        ['admin', 'ti', 'manutencao'].includes(usuarioAtual.papel) && chamado.usuario?.id === usuarioAtual.id);
 }
 
 function renderizarDetalhes(chamado) {

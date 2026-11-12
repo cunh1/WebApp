@@ -66,6 +66,7 @@ router.put('/:id', carregarChamado, (req, res) => {
   }
   if (cargo !== 'admin' && atual.usuario.id !== req.usuario.id) return res.status(403).json({ erro: 'Somente quem abriu o chamado ou um administrador pode editá-lo.' });
   if (atual.status !== 'aberto') return res.status(409).json({ erro: 'Somente chamados abertos podem ser editados.' });
+  if (cargo === 'usuario') return res.status(403).json({ erro: 'Usuários sem setor podem apenas abrir chamados.' });
   const erros = validarCampos(c);
   const setorDerivadoDoTipo = c.tipo === 'T.I' ? 'TI' : c.tipo === 'Manutenção' ? 'Manutenção' : undefined;
   // Registros legados podem ter setor_responsavel nulo. Inferimos o setor a partir
@@ -129,6 +130,7 @@ router.delete('/:id/excluir', carregarChamado, (req, res) => {
   if (atual.status === 'fechado' || atual.cancelado) {
     return res.status(409).json({ erro: 'Chamados fechados ou cancelados não podem ser excluídos.' });
   }
+  if (req.usuario.papel === 'usuario') return res.status(403).json({ erro: 'Usuários sem setor podem apenas abrir chamados.' });
   const cru = chamados.buscarCru(atual.id);
   if (!chamados.excluir(atual.id)) return res.status(404).json({ erro: 'Chamado não encontrado.' });
   removerImagem(cru?.imagem1_path);
