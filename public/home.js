@@ -354,14 +354,10 @@ function desenharLinha(chamado) {
         <td>${escapar(rotuloStatus(chamado.status))}</td>
         <td>${fechamento.data}</td>
         <td>${fechamento.hora}</td>
-        <td>${chamado.atendente ? escapar(chamado.atendente.nome) : '—'}</td>
-        <td>${chamado.restrito ? 'Sim' : 'Não'}</td>
-        <td class="celula-acoes">${podeExcluirChamado(chamado) ? `<button type="button" class="acao-excluir-lista" data-excluir-chamado="${chamado.id}" aria-label="Excluir chamado #${chamado.id}" title="Excluir chamado">🗑 Excluir</button>` : '—'}</td>
     `;
     // A linha inteira abre o chamado; tabindex/Enter/Espaço dão o mesmo acesso a quem usa teclado.
     tr.tabIndex = 0;
     tr.addEventListener('click', (evento) => {
-        if (evento.target.closest('[data-excluir-chamado]')) return;
         abrirDetalhes(chamado.id);
     });
     tr.addEventListener('keydown', (evento) => {
@@ -371,31 +367,6 @@ function desenharLinha(chamado) {
     });
     return tr;
 }
-
-corpoTabela.addEventListener('click', async (evento) => {
-    const botao = evento.target.closest('[data-excluir-chamado]');
-    if (!botao) return;
-    evento.stopPropagation();
-    const id = Number(botao.dataset.excluirChamado);
-    if (!Number.isInteger(id) || id < 1 || botao.disabled) return;
-    const confirmar = await solicitarConfirmacao({
-        titulo: 'Excluir chamado definitivamente?',
-        descricao: `Tem certeza que deseja excluir o chamado #${id}? Esta ação não pode ser desfeita.`,
-        destrutiva: true,
-    });
-    if (!confirmar) return;
-    botao.disabled = true;
-    try {
-        const resposta = await fetch(`/chamados/${id}/excluir`, { method: 'DELETE', credentials: 'include' });
-        const dados = await resposta.json().catch(() => ({}));
-        if (!resposta.ok) throw new Error(dados.erro || 'Não foi possível excluir o chamado.');
-        await carregarChamados();
-        window.showToast(`Chamado #${id} excluído com sucesso.`, 'success');
-    } catch (erro) {
-        botao.disabled = false;
-        window.showToast(erro.message, 'error');
-    }
-});
 
 function selecionarLinha(id) {
     chamadoSelecionadoId = chamadoSelecionadoId === id ? null : id; // clicar de novo desmarca
@@ -410,7 +381,7 @@ async function carregarChamados() {
     if (buscarCancelados) params.set('incluirCancelados', '1');
     const url = `/chamados${params.toString() ? `?${params}` : ''}`;
     if (!chamadosCarregados) {
-        corpoTabela.innerHTML = Array.from({ length: 5 }, (_, linha) => `<tr aria-hidden="true">${Array.from({ length: 12 }, (__, coluna) => `<td><span class="skeleton skeleton-cell skeleton-cell--${(linha + coluna) % 3}"></span></td>`).join('')}</tr>`).join('');
+        corpoTabela.innerHTML = Array.from({ length: 5 }, (_, linha) => `<tr aria-hidden="true">${Array.from({ length: 9 }, (__, coluna) => `<td><span class="skeleton skeleton-cell skeleton-cell--${(linha + coluna) % 3}"></span></td>`).join('')}</tr>`).join('');
         tabelaChamados.hidden = false;
         tabelaChamados.setAttribute('aria-busy', 'true');
         estadoVazioChamados.hidden = true;
@@ -425,7 +396,6 @@ async function carregarChamados() {
         cacheIncluiCancelados = buscarCancelados;
         tabelaChamados.removeAttribute('aria-busy');
         chamadoSelecionadoId = null;
-        atualizarOpcoesAtendentes();
         aplicarFiltrosChamados();
     } catch (erro) {
         if (!chamadosCarregados) {
@@ -452,24 +422,10 @@ function dataLocalChamado(valor) {
     return `${mapa.year}-${mapa.month}-${mapa.day}`;
 }
 
-function atualizarOpcoesAtendentes() {
-    const select = document.getElementById('filtroAtendente');
-    const selecionado = select.value;
-    const atendentes = new Map();
-    for (const chamado of chamadosDisponiveis) {
-        if (chamado.atendente?.id != null) atendentes.set(String(chamado.atendente.id), chamado.atendente.nome || `Atendente #${chamado.atendente.id}`);
-    }
-    select.replaceChildren(new Option('Todos os atendentes', ''));
-    for (const [id, nome] of [...atendentes].sort((a, b) => a[1].localeCompare(b[1], 'pt-BR'))) select.add(new Option(nome, id));
-    select.add(new Option('Sem atendente', '__none__'));
-    if ([...select.options].some(opcao => opcao.value === selecionado)) select.value = selecionado;
-}
-
 function aplicarFiltrosChamados() {
     if (!chamadosCarregados) return;
     const pesquisa = normalizarPesquisa(document.getElementById('pesquisaChamados').value);
     const status = document.getElementById('filtroStatus').value;
-    const atendente = document.getElementById('filtroAtendente').value;
     const inicio = document.getElementById('filtroDataInicio').value;
     const fim = document.getElementById('filtroDataFim').value;
     const setor = filtroTipoAtual === 'T.I' ? 'TI' : filtroTipoAtual;
@@ -478,8 +434,7 @@ function aplicarFiltrosChamados() {
         const textoPesquisa = !pesquisa || String(chamado.id).includes(pesquisa) || nomeUsuario.includes(pesquisa);
         const data = dataLocalChamado(chamado.criadoEm);
         const correspondeSetor = !setor || (chamado.setorResponsavel || chamado.tipo) === setor;
-        const correspondeAtendente = !atendente || (atendente === '__none__' ? !chamado.atendente : String(chamado.atendente?.id) === atendente);
-        return textoPesquisa && correspondeSetor && (!status || chamado.status === status) && correspondeAtendente &&
+        return textoPesquisa && correspondeSetor && (!status || chamado.status === status) &&
             (!inicio || (data && data >= inicio)) && (!fim || (data && data <= fim));
     });
     corpoTabela.replaceChildren(...chamados.map(desenharLinha));
@@ -487,7 +442,6 @@ function aplicarFiltrosChamados() {
     if (pesquisa) filtros.push(`Pesquisa: ${document.getElementById('pesquisaChamados').value.trim()}`);
     if (setor) filtros.push(`Setor: ${filtroTipoAtual}`);
     if (status) filtros.push(`Status: ${rotuloStatus(status)}`);
-    if (atendente) filtros.push(`Atendente: ${atendente === '__none__' ? 'Sem atendente' : document.getElementById('filtroAtendente').selectedOptions[0]?.textContent}`);
     if (inicio) filtros.push(`A partir de: ${inicio.split('-').reverse().join('/')}`);
     if (fim) filtros.push(`Até: ${fim.split('-').reverse().join('/')}`);
     if (incluirCancelados) filtros.push('Cancelados incluídos');
@@ -518,7 +472,6 @@ function limparFiltrosChamados() {
     incluirCancelados = false;
     document.getElementById('pesquisaChamados').value = '';
     document.getElementById('filtroStatus').value = '';
-    document.getElementById('filtroAtendente').value = '';
     document.getElementById('filtroDataInicio').value = '';
     document.getElementById('filtroDataFim').value = '';
     for (const id of ['Manutencao', 'TI']) {
@@ -588,7 +541,7 @@ document.getElementById('limparTodosFiltros').addEventListener('click', async ()
     await carregarChamados();
 });
 document.getElementById('pesquisaChamados').addEventListener('input', aplicarFiltrosChamados);
-for (const id of ['filtroAtendente', 'filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
+for (const id of ['filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
 document.getElementById('filtroStatus').addEventListener('change', () => {
     if (document.getElementById('filtroStatus').value === 'cancelado' && !cacheIncluiCancelados) carregarChamados();
     else aplicarFiltrosChamados();
