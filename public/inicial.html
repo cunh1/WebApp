@@ -3,21 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>try{const t=localStorage.getItem('webapp.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch{}</script>
     <title>WebApp_Seiren</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="frontend-modern.css">
     <script src="toast.js" defer></script>
-    <script src="theme.js" defer></script>
     <script src="script.js" defer></script>
 </head>
 <body>
     <div class="tela_inicial">
     <div class="card">
-        <img src="res/logo_150x150.png" id="logo" alt="Logo Seiren">
-        <input type="text" id="nome" placeholder=" Login:" aria-label="Login" autocomplete="username">
-        <input type="password" id="senha" placeholder=" Senha:" aria-label="Senha" autocomplete="current-password">
-        <button type="button" id="botao">Confirmar</button>
+        <img src="res/seiren-logo.png" id="logo" alt="SEIREN">
+        <label for="nome">Login</label>
+        <input type="text" id="nome" aria-label="Login" autocomplete="username">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" aria-label="Senha" autocomplete="current-password">
+        <button type="button" id="botao">
+            <span>Entrar</span>
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></svg>
+        </button>
         <img id="digital" src="res/imagem1.png" alt="" aria-hidden="true">
     </div>
     </div>

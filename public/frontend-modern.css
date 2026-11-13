@@ -516,6 +516,129 @@ header:has(#linkUsuarios) .profile-menu { margin-left: auto; }
 @media (max-width: 560px) {
   .theme-toggle--floating { top: max(10px, env(safe-area-inset-top)); right: max(10px, env(safe-area-inset-right)); min-height: 40px; padding: 8px 10px; }
 }
+
+/* Identidade visual da tela de login. Os recursos ficam em public/res no deploy. */
+body:has(.tela_inicial) {
+  background-image:
+    linear-gradient(rgba(3, 43, 94, .3), rgba(3, 35, 78, .4)),
+    url("res/login-background.png");
+  background-position: center 52%;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+.tela_inicial {
+  min-height: 100vh;
+  min-height: 100dvh;
+  height: auto;
+  padding: 24px 20px;
+}
+.tela_inicial .card {
+  position: relative;
+  isolation: isolate;
+  width: min(88vw, 920px);
+  max-width: 920px;
+  height: auto;
+  min-height: 500px;
+  padding: 30px clamp(24px, 6vw, 68px) 38px;
+  gap: 9px;
+  overflow: hidden;
+  border: 1px solid rgba(214, 234, 255, .34);
+  border-radius: 16px;
+  background: linear-gradient(145deg, rgba(13, 66, 120, .64), rgba(7, 37, 80, .68));
+  box-shadow: 0 28px 76px rgba(0, 18, 48, .36), inset 0 1px 0 rgba(255, 255, 255, .16);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+}
+.tela_inicial .card::before {
+  position: absolute;
+  z-index: -1;
+  inset: 10px;
+  border: 1px solid rgba(220, 237, 255, .12);
+  border-radius: 10px;
+  content: '';
+  pointer-events: none;
+}
+.tela_inicial .card::after {
+  position: absolute;
+  z-index: -1;
+  top: -170px;
+  left: 50%;
+  width: 520px;
+  height: 280px;
+  border-radius: 50%;
+  background: rgba(105, 181, 255, .12);
+  content: '';
+  filter: blur(30px);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+.tela_inicial .card #logo {
+  width: min(76vw, 390px);
+  height: auto;
+  max-height: 112px;
+  margin: 0 0 11px;
+  border-radius: 0;
+  object-fit: contain;
+}
+.tela_inicial .card label {
+  width: min(100%, 270px);
+  margin-top: 2px;
+  padding-left: 4px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.25;
+  text-shadow: 0 1px 4px rgba(0, 24, 58, .65);
+}
+.tela_inicial .card input[type="text"],
+.tela_inicial .card input[type="password"] {
+  width: min(100%, 270px);
+  min-height: 48px;
+  padding: 11px 14px;
+  border: 1px solid rgba(255, 255, 255, .68);
+  border-radius: 11px;
+  background: rgba(245, 250, 255, .88);
+  color: #172033;
+  box-shadow: 0 4px 14px rgba(0, 24, 60, .12);
+  transition: border-color .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.tela_inicial .card input[type="text"]:focus,
+.tela_inicial .card input[type="password"]:focus {
+  border-color: #fff;
+  background: #fff;
+  outline: 3px solid rgba(224, 239, 255, .38);
+  box-shadow: 0 0 0 5px rgba(13, 60, 112, .2);
+}
+.tela_inicial #botao {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: min(100%, 270px);
+  min-height: 60px;
+  margin-top: 42px;
+  padding: 11px 20px;
+  border: 1px solid rgba(225, 241, 255, .28);
+  border-radius: 11px;
+  background: linear-gradient(135deg, #145984, #0c4168);
+  color: #fff;
+  font-size: 25px;
+  font-weight: 650;
+  letter-spacing: .01em;
+  box-shadow: 0 10px 25px rgba(0, 20, 52, .3), inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+.tela_inicial #botao svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; transition: transform .16s ease; }
+.tela_inicial #botao:hover { background: linear-gradient(135deg, #176994, #104b75); box-shadow: 0 12px 28px rgba(0, 20, 52, .36), inset 0 1px 0 rgba(255, 255, 255, .18); }
+.tela_inicial #botao:hover svg { transform: translateX(3px); }
+.tela_inicial #botao:active { background: #0b3858; transform: translateY(1px); }
+.tela_inicial #botao:focus-visible { outline: 3px solid rgba(255, 255, 255, .7); outline-offset: 3px; }
+@media (max-width: 600px) {
+  body:has(.tela_inicial) { background-position: 61% center; }
+  .tela_inicial { padding: 20px 16px; }
+  .tela_inicial .card { width: 100%; max-width: none; min-height: 460px; padding: 25px 18px 30px; border-radius: 14px; }
+  .tela_inicial .card #logo { width: min(78vw, 340px); }
+  .tela_inicial #botao { margin-top: 30px; }
+}
 @media (prefers-reduced-motion: reduce) {
   .theme-toggle { transition: none; }
 }
