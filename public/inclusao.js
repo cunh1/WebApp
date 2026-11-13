@@ -55,8 +55,16 @@ window.addEventListener('load', async () => {
             seletorTipo.value = chamado.setorResponsavel === 'TI' ? 'T.I' : (chamado.setorResponsavel || chamado.tipo || '');
             document.getElementById('Evento').value = chamado.evento || '';
             document.getElementById('Solicitacao').value = chamado.solicitacao || '';
-            if (chamado.imagem1) document.getElementById('imagem1').src = chamado.imagem1;
-            if (chamado.imagem2) document.getElementById('imagem2').src = chamado.imagem2;
+            if (chamado.imagem1) {
+                const imagem1 = document.getElementById('imagem1');
+                imagem1.src = chamado.imagem1;
+                imagem1.hidden = false;
+            }
+            if (chamado.imagem2) {
+                const imagem2 = document.getElementById('imagem2');
+                imagem2.src = chamado.imagem2;
+                imagem2.hidden = false;
+            }
         } catch (erro) {
             window.showToastOnNextPage(erro.message || 'Não foi possível carregar o chamado selecionado.', 'error');
             limparEstadoEdicao();
@@ -81,14 +89,9 @@ function limparEstadoEdicao() {
 }
 
 function configurarImagem(inputId, imagemId, marcarAlterada) {
-    // A miniatura funciona como botão: clique e teclado (Enter/Espaço) abrem o seletor de arquivo.
-    const miniatura = document.getElementById(imagemId);
-    miniatura.addEventListener('click', () => document.getElementById(inputId).click());
-    miniatura.addEventListener('keydown', (evento) => {
-        if (evento.key !== 'Enter' && evento.key !== ' ') return;
-        evento.preventDefault();
-        document.getElementById(inputId).click();
-    });
+    // O botão de anexo abre o mesmo seletor usado para carregar e pré-visualizar a imagem.
+    const botaoAnexo = document.querySelector(`[data-input-imagem="${inputId}"]`);
+    botaoAnexo.addEventListener('click', () => document.getElementById(inputId).click());
     document.getElementById(inputId).addEventListener('change', function() {
         const arquivo = this.files?.[0];
         if (!arquivo) return;
@@ -100,7 +103,9 @@ function configurarImagem(inputId, imagemId, marcarAlterada) {
         botaoSalvar.disabled = true;
         const leitor = new FileReader();
         leitor.onload = (evento) => {
-            document.getElementById(imagemId).src = evento.target.result;
+            const imagem = document.getElementById(imagemId);
+            imagem.src = evento.target.result;
+            imagem.hidden = false;
             marcarAlterada();
             botaoSalvar.disabled = false;
         };

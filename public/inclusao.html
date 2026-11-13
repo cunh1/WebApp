@@ -34,11 +34,23 @@
         </div>
 
         <div class="linha_3">
-            <input type="file" id="inputImagem1" accept="image/*" style="display:none">
-            <img class="image" id="imagem1" src="res/bkg.png" alt="Anexar imagem 1" role="button" tabindex="0">
+            <div class="cartao-anexo">
+                <input type="file" id="inputImagem1" accept="image/*" hidden>
+                <button type="button" class="botao-anexo" data-input-imagem="inputImagem1">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 15v4h14v-4"/></svg>
+                    <span>Anexar imagem 1</span>
+                </button>
+                <img class="image" id="imagem1" alt="Pré-visualização da imagem 1" hidden>
+            </div>
 
-            <input type="file" id="inputImagem2" accept="image/*" style="display:none">
-            <img class="image" id="imagem2" src="res/bkg.png" alt="Anexar imagem 2" role="button" tabindex="0">
+            <div class="cartao-anexo">
+                <input type="file" id="inputImagem2" accept="image/*" hidden>
+                <button type="button" class="botao-anexo" data-input-imagem="inputImagem2">
+                    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 16V4m0 0L7 9m5-5 5 5M5 15v4h14v-4"/></svg>
+                    <span>Anexar imagem 2</span>
+                </button>
+                <img class="image" id="imagem2" alt="Pré-visualização da imagem 2" hidden>
+            </div>
         </div>
 
         <div class="linha_4">
