@@ -663,6 +663,20 @@ body:has(.tela_inicial) {
 :root[data-theme="dark"] .call-filters { background: var(--paper); border-color: var(--line); }
 :root[data-theme="dark"] .call-filters__clear:disabled { color: var(--muted); background: #253247; border-color: #46556d; }
 :root[data-theme="dark"] .filter-chip { color: #d2dcff; background: #2b3957; border-color: #485875; }
+@media (max-width: 760px) {
+  :root[data-theme="dark"] #menuNavegacao { background: var(--paper); }
+  :root[data-theme="dark"] .mobile-nav-toggle {
+    border-color: #46556d;
+    background: #202b3e;
+    color: var(--ink);
+  }
+  :root[data-theme="dark"] .mobile-nav-toggle:hover,
+  :root[data-theme="dark"] .nav-mobile-aberto .mobile-nav-toggle {
+    border-color: #60718c;
+    background: #2b3957;
+  }
+  :root[data-theme="dark"] .mobile-nav-toggle > svg:first-child { stroke: #b8c7ff; }
+}
 @media (max-width: 900px) {
   .call-filters__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .call-filter--search { grid-column: span 2; }
