@@ -345,15 +345,15 @@ function desenharLinha(chamado) {
     if (chamado.cancelado) tr.classList.add('chamado-cancelado');
     if (chamado.status === 'fechado') tr.classList.add('chamado-fechado');
     tr.innerHTML = `
-        <td data-label="Chamado">${chamado.id}</td>
-        <td data-label="Usuário">${escapar(chamado.usuario.nome)}</td>
-        <td data-label="Abertura">${abertura.data}</td>
-        <td data-label="Tipo">${escapar(chamado.tipo)}</td>
+        <td>${chamado.id}</td>
+        <td>${escapar(chamado.usuario.nome)}</td>
+        <td>${abertura.data}</td>
+        <td>${escapar(chamado.tipo)}</td>
         <td>${escapar(chamado.setorResponsavel || 'Sem classificação')}</td>
-        <td data-label="Hora da abertura">${abertura.hora}</td>
-        <td data-label="Status">${escapar(rotuloStatus(chamado.status))}</td>
-        <td data-label="Data do fechamento">${fechamento.data}</td>
-        <td data-label="Hora do fechamento">${fechamento.hora}</td>
+        <td>${abertura.hora}</td>
+        <td>${escapar(rotuloStatus(chamado.status))}</td>
+        <td>${fechamento.data}</td>
+        <td>${fechamento.hora}</td>
     `;
     // A linha inteira abre o chamado; tabindex/Enter/Espaço dão o mesmo acesso a quem usa teclado.
     tr.tabIndex = 0;
