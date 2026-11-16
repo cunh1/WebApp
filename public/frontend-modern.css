@@ -712,3 +712,68 @@ body:has(.tela_inicial) {
   .call-filters__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
   .call-filter--search { grid-column: 1 / -1; }
 }
+
+/* Ajustes de toque e largura para celulares e tablets estreitos. */
+@media (max-width: 760px) {
+  body { min-height: 100vh; min-height: 100dvh; }
+  #container {
+    width: 100%;
+    max-width: none;
+    min-height: 100dvh;
+    margin: 0;
+    padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    gap: 10px;
+  }
+  #container > header { gap: 10px; padding: 10px 12px; }
+  header:has(.profile-menu) { align-items: center; }
+  .profile-menu { flex: 1 1 100%; margin: 0; min-width: 0; }
+  .profile-trigger { width: 100%; justify-content: flex-start; }
+  aside.item { gap: 8px; }
+  .mobile-nav-toggle { min-height: 52px; touch-action: manipulation; }
+  .mobile-nav-options { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; }
+  .textM { min-height: 44px; }
+  #areaLista, #container:has(#tabelaUsuarios) > main { min-width: 0; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  #chamados { min-width: 850px; }
+  #chamados th, #chamados td { padding: 11px 9px; }
+  .call-filters { padding: 14px; }
+  .call-filters__top { align-items: stretch; flex-direction: column; }
+  .call-filters__clear { align-self: flex-start; min-height: 44px; }
+  .call-filters__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+  .call-filter--search { grid-column: 1 / -1; }
+  .call-filter input, .call-filter select { min-height: 46px; font-size: 16px; }
+  #acoesLista { display: flex; flex-wrap: wrap; gap: 8px; padding: 10px; }
+  #acoesLista .button { flex: 1 1 42%; min-height: 46px; margin: 0; }
+  #barraSuperior { gap: 9px; }
+  #busca { width: 100%; min-width: 0; min-height: 48px; font-size: 16px; }
+  #barraSuperior .button { min-height: 46px; }
+  #tabelaUsuarios { min-width: 720px; }
+  .acoes-usuario { flex-wrap: nowrap; }
+  .acoes-usuario button { min-height: 40px; }
+  #overlay, #overlayForm { padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom)); }
+  #modal-confirma, #modalForm { width: 100%; max-height: calc(100dvh - 20px); overflow-y: auto; overscroll-behavior: contain; }
+  #formUsuario .text, #formUsuario select { min-height: 48px; font-size: 16px; }
+  .tela { width: 100%; max-width: none; padding: 18px 14px; gap: 14px; }
+  .linha_1 { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  #Nchamado, #Tipo, #Evento { width: 100%; min-height: 48px; height: auto; font-size: 16px; }
+  #Solicitacao { width: 100%; min-height: 150px; font-size: 16px; }
+  .linha_3 { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .linha_3 .cartao-anexo .botao-anexo { min-height: 52px; font-size: 15px; }
+  .linha_4 { gap: 9px; }
+  .linha_4 .button { min-height: 48px; }
+  body:has(.tela_inicial) { padding: 0; }
+  .tela_inicial { min-height: 100dvh; padding: 20px 16px; }
+  .tela_inicial .card { min-height: 0; }
+}
+@media (max-width: 420px) {
+  #container { padding: 7px; gap: 8px; }
+  #container > header { padding: 9px; }
+  #titulo { max-width: 40vw; }
+  #linkUsuarios, #voltar { min-height: 42px; }
+  .call-filters { padding: 12px; }
+  .call-filters__grid { grid-template-columns: minmax(0, 1fr); }
+  .call-filter--search { grid-column: auto; }
+  .call-filters__clear { width: 100%; }
+  #acoesLista .button { flex-basis: 100%; }
+  #modal-confirma, #modalForm { padding: 18px 15px; }
+  .tela_inicial .card { padding: 24px 15px 28px; }
+}
