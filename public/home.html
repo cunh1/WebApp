@@ -18,7 +18,7 @@
           <header class="item">
             <img class="logo" id="logo" src="res/logo_150x150.png" alt="Logo Seiren">
             <h1 id="titulo">Sistema de Chamados</h1>
-            <a id="linkUsuarios" class="header-nav header-nav--users" href="usuarios.html" style="display:none;">
+            <a id="linkUsuarios" class="header-nav header-nav--users" href="usuarios.html" aria-label="Gerenciamento de usuários" style="display:none;">
               <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M13 17v-1.5a3 3 0 0 0-3-3H5a3 3 0 0 0-3 3V17m12-8.5a3 3 0 0 1 0 5.8M7.5 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm8-6a3 3 0 0 1 0 5.8" /></svg>
               <span>Usuários</span>
             </a>
@@ -62,9 +62,16 @@
               </div>
               <div class="call-filters__grid">
                 <label class="call-filter call-filter--search"><span>Chamado ou usuário</span><input id="pesquisaChamados" type="search" placeholder="Número do chamado ou nome do usuário" autocomplete="off"></label>
+                <button type="button" class="call-filters__toggle" id="alternarFiltrosChamados" aria-expanded="false" aria-controls="filtrosAvancadosChamados">
+                  <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M5 10h10m-7 5h4" /></svg>
+                  <span>Filtros</span>
+                  <svg class="call-filters__toggle-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5" /></svg>
+                </button>
+                <div class="call-filters__advanced" id="filtrosAvancadosChamados">
                 <label class="call-filter"><span>Status</span><select id="filtroStatus"><option value="">Todos os status</option><option value="aberto">Aberto</option><option value="em_andamento">Em andamento</option><option value="fechado">Fechado</option><option value="cancelado">Cancelado</option></select></label>
                 <label class="call-filter"><span>Abertura a partir de</span><input id="filtroDataInicio" type="date"></label>
                 <label class="call-filter"><span>Abertura até</span><input id="filtroDataFim" type="date"></label>
+                </div>
               </div>
               <div class="filter-chips" id="filtrosAtivos" aria-label="Filtros ativos"></div>
             </section>

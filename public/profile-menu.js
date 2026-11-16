@@ -17,6 +17,7 @@
             .map((parte) => Array.from(parte)[0]).join('').toLocaleUpperCase('pt-BR');
 
         document.getElementById('usuarioLogado').textContent = nome || 'Usuário';
+        gatilho.setAttribute('aria-label', `Perfil de ${nome || 'Usuário'}`);
         document.getElementById('avatarPerfil').textContent = iniciais || '?';
         document.getElementById('perfilNome').textContent = nome || 'Usuário';
         document.getElementById('perfilCargo').textContent = nomesCargo[cargo] || (cargo ? String(cargo) : 'Não informado');

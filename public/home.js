@@ -341,6 +341,7 @@ function desenharLinha(chamado) {
     const fechamento = formatarData(chamado.fechadoEm, true);
     const tr = document.createElement('tr');
     tr.dataset.id = chamado.id;
+    tr.dataset.titulo = chamado.descricao || 'Chamado sem descriÃ§Ã£o';
     if (chamado.id === chamadoSelecionadoId) tr.classList.add('selecionada');
     if (chamado.cancelado) tr.classList.add('chamado-cancelado');
     if (chamado.status === 'fechado') tr.classList.add('chamado-fechado');
@@ -351,7 +352,7 @@ function desenharLinha(chamado) {
         <td>${escapar(chamado.tipo)}</td>
         <td>${escapar(chamado.setorResponsavel || 'Sem classificação')}</td>
         <td>${abertura.hora}</td>
-        <td>${escapar(rotuloStatus(chamado.status))}</td>
+        <td class="celula-status status-${escapar(chamado.status)}">${escapar(rotuloStatus(chamado.status))}</td>
         <td>${fechamento.data}</td>
         <td>${fechamento.hora}</td>
     `;
@@ -431,7 +432,8 @@ function aplicarFiltrosChamados() {
     const setor = filtroTipoAtual === 'T.I' ? 'TI' : filtroTipoAtual;
     const chamados = chamadosDisponiveis.filter(chamado => {
         const nomeUsuario = normalizarPesquisa(chamado.usuario?.nome);
-        const textoPesquisa = !pesquisa || String(chamado.id).includes(pesquisa) || nomeUsuario.includes(pesquisa);
+        const descricao = normalizarPesquisa(chamado.descricao);
+        const textoPesquisa = !pesquisa || String(chamado.id).includes(pesquisa) || nomeUsuario.includes(pesquisa) || descricao.includes(pesquisa);
         const data = dataLocalChamado(chamado.criadoEm);
         const correspondeSetor = !setor || (chamado.setorResponsavel || chamado.tipo) === setor;
         return textoPesquisa && correspondeSetor && (!status || chamado.status === status) &&
@@ -540,7 +542,15 @@ document.getElementById('limparTodosFiltros').addEventListener('click', async ()
     limparFiltrosChamados();
     await carregarChamados();
 });
+document.getElementById('pesquisaChamados').placeholder = 'Número, assunto ou solicitante';
 document.getElementById('pesquisaChamados').addEventListener('input', aplicarFiltrosChamados);
+const alternarFiltrosChamados = document.getElementById('alternarFiltrosChamados');
+const filtrosAvancadosChamados = document.getElementById('filtrosAvancadosChamados');
+alternarFiltrosChamados.addEventListener('click', () => {
+    const aberto = alternarFiltrosChamados.getAttribute('aria-expanded') !== 'true';
+    alternarFiltrosChamados.setAttribute('aria-expanded', String(aberto));
+    filtrosAvancadosChamados.classList.toggle('aberto', aberto);
+});
 for (const id of ['filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
 document.getElementById('filtroStatus').addEventListener('change', () => {
     if (document.getElementById('filtroStatus').value === 'cancelado' && !cacheIncluiCancelados) carregarChamados();

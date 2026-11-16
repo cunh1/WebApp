@@ -111,7 +111,6 @@
     'footer footer' ;
     gap: 1px;
     justify-content: center;
-    overflow-x: hidden;
 }
 
 #chamados {
