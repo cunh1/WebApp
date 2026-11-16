@@ -6,13 +6,13 @@ import { paraSql, deSql } from './tempo.js';
 const novoToken = () => crypto.randomBytes(32).toString('base64url');
 const hashToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
-export function criarSessao(usuarioId, { ip, userAgent } = {}) {
+export function criarSessao(usuarioId, { ip, userAgent, manterConectado = false } = {}) {
   const token = novoToken();
   const agora = Date.now();
   db.prepare(
-    `INSERT INTO sessoes (usuario_id, token_hash, criada_em, ultimo_uso_em, expira_em, ip, user_agent)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`,
-  ).run(usuarioId, hashToken(token), paraSql(agora), paraSql(agora), paraSql(agora + config.auth.sessaoMaxMs), ip ?? null, userAgent ?? null);
+    `INSERT INTO sessoes (usuario_id, token_hash, criada_em, ultimo_uso_em, expira_em, ip, user_agent, manter_conectado)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+  ).run(usuarioId, hashToken(token), paraSql(agora), paraSql(agora), paraSql(agora + config.auth.sessaoMaxMs), ip ?? null, userAgent ?? null, manterConectado ? 1 : 0);
 
   db.prepare(
     `DELETE FROM sessoes WHERE usuario_id = ?
@@ -25,7 +25,7 @@ export function validarSessao(token) {
   if (typeof token !== 'string' || token.length > 200) return null;
   const linha = db
     .prepare(
-      `SELECT s.id AS sessao_id, s.ultimo_uso_em, s.expira_em, u.id, u.nome, u.login, u.papel, u.cargo, u.setor, u.ativo
+      `SELECT s.id AS sessao_id, s.ultimo_uso_em, s.expira_em, s.manter_conectado, u.id, u.nome, u.login, u.papel, u.cargo, u.setor, u.ativo
          FROM sessoes s JOIN usuarios u ON u.id = s.usuario_id
         WHERE s.token_hash = ?`,
     )
@@ -36,7 +36,8 @@ export function validarSessao(token) {
   }
 
   const agora = Date.now();
-  const inativa = agora - deSql(linha.ultimo_uso_em) > config.auth.sessaoInatividadeMs;
+  const limiteInatividade = linha.manter_conectado ? config.auth.sessaoMaxMs : config.auth.sessaoInatividadeMs;
+  const inativa = agora - deSql(linha.ultimo_uso_em) > limiteInatividade;
   if (inativa || deSql(linha.expira_em) <= agora) {
     db.prepare('DELETE FROM sessoes WHERE id = ?').run(linha.sessao_id);
     return null;

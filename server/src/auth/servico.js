@@ -7,7 +7,7 @@ import { criarSessao, revogarSessao } from './sessoes.js';
 
 const muitasTentativas = () => new ErroHttp(429, 'Muitas tentativas. Aguarde alguns minutos e tente novamente.');
 
-export async function login({ login, senha }, { ip, userAgent } = {}) {
+export async function login({ login, senha, manterConectado = false }, { ip, userAgent } = {}) {
   if (typeof login !== 'string' || !login.trim() || typeof senha !== 'string' || !senha) {
     throw new ErroHttp(400, 'Informe login e senha');
   }
@@ -31,8 +31,9 @@ export async function login({ login, senha }, { ip, userAgent } = {}) {
   }
 
   limitador.limpar(chaveLogin);
-  const token = criarSessao(usuario.id, { ip, userAgent });
-  return { token, usuario: usuarios.paraPublico(usuario) };
+  const lembrar = manterConectado === true;
+  const token = criarSessao(usuario.id, { ip, userAgent, manterConectado: lembrar });
+  return { token, usuario: usuarios.paraPublico(usuario), manterConectado: lembrar };
 }
 
 export function logout(token) {

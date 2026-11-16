@@ -3,6 +3,7 @@
 async function login() {
     const usuario = document.getElementById('nome').value.trim();
     const senha = document.getElementById('senha').value;
+    const manterConectado = document.getElementById('manterConectado').checked;
     const botao = document.getElementById('botao');
 
     if (usuario === '' || senha === '') {
@@ -16,7 +17,7 @@ async function login() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             credentials: 'include',
-            body: JSON.stringify({ login: usuario, senha: senha }),
+            body: JSON.stringify({ login: usuario, senha: senha, manterConectado }),
         });
         if (!resposta.ok) {
             const dados = await resposta.json().catch(() => ({}));

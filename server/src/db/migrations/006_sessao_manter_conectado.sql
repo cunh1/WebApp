@@ -1,0 +1,2 @@
+ALTER TABLE sessoes
+  ADD COLUMN manter_conectado INTEGER NOT NULL DEFAULT 0;

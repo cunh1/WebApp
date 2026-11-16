@@ -609,6 +609,29 @@ body:has(.tela_inicial) {
   outline: 3px solid rgba(224, 239, 255, .38);
   box-shadow: 0 0 0 5px rgba(13, 60, 112, .2);
 }
+.tela_inicial .card .manter-conectado {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: min(100%, 270px);
+  margin: 3px 0 0;
+  padding: 0 2px;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  text-shadow: 0 1px 4px rgba(0, 24, 58, .65);
+  cursor: pointer;
+}
+.tela_inicial .card .manter-conectado input[type="checkbox"] {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin: 0;
+  appearance: auto;
+  -webkit-appearance: checkbox;
+  accent-color: #57a6e6;
+  cursor: pointer;
+}
 .tela_inicial #botao {
   display: inline-flex;
   align-items: center;
