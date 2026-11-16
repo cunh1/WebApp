@@ -48,7 +48,7 @@ let usuariosCarregados = false;
 async function carregarUsuarios() {
     const termo = document.getElementById('busca').value.trim();
     if (!usuariosCarregados) {
-        tabela.style.display = 'none';
+        tabela.classList.remove('com-registros');
         listaVazia.hidden = true;
         carregando.style.display = 'block';
     }
@@ -64,7 +64,7 @@ async function carregarUsuarios() {
         usuariosCarregados = true;
         carregando.style.display = 'none';
         if (!lista.length) {
-            tabela.style.display = 'none';
+            tabela.classList.remove('com-registros');
             const buscando = Boolean(termo);
             document.getElementById('listaVaziaTitulo').textContent = buscando
                 ? 'Nenhum usuário encontrado'
@@ -79,7 +79,7 @@ async function carregarUsuarios() {
         }
         listaVazia.hidden = true;
         corpoTabela.innerHTML = lista.map(desenharLinha).join('');
-        tabela.style.display = 'table';
+        tabela.classList.add('com-registros');
     } catch (erro) {
         if (!usuariosCarregados) carregando.style.display = 'none';
         mostrarMensagem(erro.message, 'erro');

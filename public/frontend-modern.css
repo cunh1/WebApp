@@ -777,3 +777,146 @@ body:has(.tela_inicial) {
   #modal-confirma, #modalForm { padding: 18px 15px; }
   .tela_inicial .card { padding: 24px 15px 28px; }
 }
+
+/* Em telas estreitas, mantenha o cabeçalho previsível e transforme tabelas em cartões. */
+#tabelaUsuarios.com-registros { display: table; }
+@media (max-width: 760px) {
+  #container { min-width: 0; overflow-x: clip; }
+  #container > main, #areaLista, #container:has(#tabelaUsuarios) > main {
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: clip;
+  }
+  #container > header:has(.profile-menu) {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+    grid-template-areas: "brand title action" "profile profile profile";
+    align-items: center;
+    gap: 8px 10px;
+    min-width: 0;
+  }
+  #container > header:has(.profile-menu) #logo { grid-area: brand; width: 40px; height: 40px; object-fit: contain; }
+  #container > header:has(.profile-menu) #titulo {
+    grid-area: title;
+    position: static;
+    inset: auto;
+    transform: none;
+    min-width: 0;
+    max-width: none;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: clamp(16px, 4.3vw, 20px);
+    line-height: 1.2;
+  }
+  #container > header:has(.profile-menu) #linkUsuarios,
+  #container > header:has(.profile-menu) #voltar {
+    grid-area: action;
+    position: static;
+    min-width: 42px;
+    min-height: 42px;
+    margin: 0;
+    padding: 8px;
+  }
+  #container > header:has(.profile-menu) #linkUsuarios { width: 42px; }
+  #container > header:has(.profile-menu) #linkUsuarios span { display: none; }
+  #container > header:has(.profile-menu) .header-nav svg { flex: 0 0 20px; width: 20px; height: 20px; }
+  #container > header:has(.profile-menu) #voltar span { display: none; }
+  #container > header:has(.profile-menu) .profile-menu { grid-area: profile; width: 100%; min-width: 0; margin: 0; }
+  #container > header:has(.profile-menu) .profile-trigger { width: 100%; max-width: none; min-height: 46px; }
+  #container > header:has(.profile-menu) .profile-trigger #usuarioLogado {
+    display: block;
+    flex: 1 1 auto;
+    min-width: 0;
+    max-width: none;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #container > header:has(.profile-menu) .profile-dropdown { right: 0; left: 0; width: auto; max-width: 100%; }
+
+  #chamados {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    border-spacing: 0;
+    table-layout: fixed;
+  }
+  #chamados[hidden] { display: none !important; }
+  #chamados thead, #tabelaUsuarios thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+  #chamados tbody, #tabelaUsuarios.com-registros tbody { display: grid; gap: 10px; }
+  #chamados tbody tr, #tabelaUsuarios.com-registros tbody tr {
+    display: block;
+    min-width: 0;
+    padding: 5px 13px;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--paper);
+    box-shadow: 0 3px 12px rgba(24, 39, 75, .06);
+  }
+  #chamados td, #tabelaUsuarios.com-registros td {
+    display: grid;
+    grid-template-columns: minmax(94px, .72fr) minmax(0, 1.28fr);
+    align-items: start;
+    gap: 8px;
+    min-width: 0;
+    padding: 9px 1px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    color: var(--ink);
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+  #chamados td::before, #tabelaUsuarios.com-registros td::before {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.4;
+  }
+  #chamados td::before { content: attr(data-label); }
+  #chamados td:nth-child(5)::before { content: "Setor responsável"; }
+  #chamados td:first-child { color: var(--brand-deep); font-weight: 700; }
+  #chamados td:last-child, #tabelaUsuarios.com-registros td:last-child { border-bottom: 0; }
+  #chamados tbody tr:hover { background: var(--paper); }
+
+  #tabelaUsuarios.com-registros {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    border: 0;
+    border-spacing: 0;
+    background: transparent;
+    table-layout: fixed;
+  }
+  #tabelaUsuarios[hidden] { display: none !important; }
+  #tabelaUsuarios.com-registros td:nth-child(1)::before { content: "Nome"; }
+  #tabelaUsuarios.com-registros td:nth-child(2)::before { content: "Login"; }
+  #tabelaUsuarios.com-registros td:nth-child(3)::before { content: "Cargo"; }
+  #tabelaUsuarios.com-registros td:nth-child(4)::before { content: "Setor"; }
+  #tabelaUsuarios.com-registros td:nth-child(5)::before { content: "Estado"; }
+  #tabelaUsuarios.com-registros td:nth-child(6)::before { content: "Ações"; }
+  .acoes-usuario { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; min-width: 0; }
+  .acoes-usuario button { min-width: 0; min-height: 44px; padding: 7px 6px; font-size: 12px; white-space: normal; }
+  .users-skeleton { max-width: 100%; overflow: hidden; }
+  .users-skeleton__row { min-width: 0; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 380px) {
+  #chamados td, #tabelaUsuarios.com-registros td { grid-template-columns: minmax(78px, .62fr) minmax(0, 1.38fr); gap: 6px; font-size: 12px; }
+  #chamados td::before, #tabelaUsuarios.com-registros td::before { font-size: 11px; }
+  #linkUsuarios, #voltar { max-width: 44px; overflow: hidden; }
+}
