@@ -1266,3 +1266,59 @@ body:has(.tela_inicial) {
   }
   #container > header:has(.profile-menu) .profile-chevron { display: none; }
 }
+
+/* Refinamento isolado para desktop: estabiliza áreas de conteúdo e tabelas.
+   Não altera os breakpoints mobile/tablet existentes (<= 1023px). */
+@media (min-width: 1024px) {
+  #container {
+    width: min(100%, 1500px);
+    grid-template-columns: minmax(180px, 210px) minmax(0, 1fr);
+    gap: 16px;
+  }
+
+  #container > header {
+    min-width: 0;
+  }
+
+  #container > header #titulo {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #areaLista,
+  #container:has(#tabelaUsuarios) > main {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #areaLista {
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+  }
+
+  #chamados {
+    width: 100%;
+    min-width: 1050px;
+  }
+
+  #container:has(#tabelaUsuarios) > main {
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+    overscroll-behavior: contain;
+  }
+
+  #tabelaUsuarios.com-registros {
+    width: 100%;
+    min-width: 900px;
+    table-layout: auto;
+  }
+
+  #tabelaUsuarios th,
+  #tabelaUsuarios td {
+    vertical-align: middle;
+  }
+
+  #tabelaUsuarios td:last-child {
+    min-width: 150px;
+  }
+}

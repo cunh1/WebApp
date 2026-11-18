@@ -1,0 +1,45 @@
+/* Refinamento desktop isolado: atua somente em viewport >= 1024px. */
+@media (min-width: 1024px) {
+  #container {
+    width: 100%;
+    max-width: 1500px;
+    grid-template-columns: minmax(190px, 220px) minmax(0, 1fr);
+    column-gap: clamp(14px, 1.5vw, 22px);
+  }
+
+  #container > header,
+  #container > aside,
+  #container > article,
+  #container > main,
+  #areaLista,
+  #areaDetalhes {
+    min-width: 0;
+  }
+
+  #container > header { flex-wrap: nowrap; }
+  #container > header #titulo { min-width: 0; overflow-wrap: anywhere; }
+  #container > header #usuarioLogado { max-width: clamp(140px, 18vw, 280px); }
+
+  /* Tabelas mantêm a densidade desktop, mas o overflow fica restrito à área da tabela. */
+  #areaLista { max-width: 100%; overflow: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  #chamados { width: 100%; min-width: 1050px; }
+  #chamados th, #chamados td { vertical-align: middle; }
+  #chamados td { max-width: 260px; }
+
+  #container:has(#tabelaUsuarios) > main { min-width: 0; max-width: 100%; overflow-x: auto; overscroll-behavior: contain; scrollbar-gutter: stable; }
+  #tabelaUsuarios.com-registros { width: 100%; min-width: 900px; table-layout: auto; }
+  #tabelaUsuarios th, #tabelaUsuarios td { vertical-align: middle; }
+  #tabelaUsuarios td:first-child { min-width: 180px; }
+  #tabelaUsuarios td:nth-child(2) { min-width: 170px; }
+  #tabelaUsuarios td:last-child { min-width: 150px; }
+
+  /* Evita que campos de busca e filtros comprimam uns aos outros. */
+  #barraSuperior { min-width: 0; }
+  #barraSuperior > * { min-width: 0; }
+  .call-filters__grid > * { min-width: 0; }
+  .call-filter input, .call-filter select { width: 100%; min-width: 0; }
+
+  /* Modais centralizados e limitados à altura útil da janela. */
+  #overlay, #overlayForm { align-items: center; justify-content: center; }
+  #modal-confirma, #modalForm { max-width: min(560px, calc(100vw - 48px)); max-height: min(88vh, 820px); overflow-y: auto; }
+}
