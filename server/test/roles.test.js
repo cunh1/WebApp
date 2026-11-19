@@ -98,27 +98,27 @@ test('iniciar atendimento é automático, atribui o atendente e usa as mesmas pe
   const chamadoManut = await comum.cli.post('/chamados', novoChamado('Manutenção', 'Atendimento manutenção'));
   const idTI = chamadoTI.data.id;
 
-  assert.equal((await comum.cli.post(`/chamados/${idTI}/andamento`)).status, 403);
-  assert.equal((await manut.cli.post(`/chamados/${idTI}/andamento`)).status, 403);
-  const iniciado = await ti.cli.post(`/chamados/${idTI}/andamento`);
+  assert.equal((await comum.cli.post(`/chamados/${idTI}/atendimento`)).status, 403);
+  assert.equal((await manut.cli.post(`/chamados/${idTI}/atendimento`)).status, 403);
+  const iniciado = await ti.cli.post(`/chamados/${idTI}/atendimento`);
   assert.equal(iniciado.status, 200, JSON.stringify(iniciado.data));
-  assert.equal(iniciado.data.status, 'em_andamento');
+  assert.equal(iniciado.data.status, 'em_atendimento');
   assert.equal(iniciado.data.atendente.id, ti.id);
   assert.equal(iniciado.data.atendente.nome, ti.nome);
   assert.ok(iniciado.data.atualizadoEm);
-  assert.equal((await ti.cli.post(`/chamados/${idTI}/andamento`)).status, 409, 'não permite iniciar duas vezes');
-  assert.equal((await comum.cli.get(`/chamados/${idTI}`)).data.status, 'em_andamento');
+  assert.equal((await ti.cli.post(`/chamados/${idTI}/atendimento`)).status, 409, 'não permite iniciar duas vezes');
+  assert.equal((await comum.cli.get(`/chamados/${idTI}`)).data.status, 'em_atendimento');
   assert.equal((await ti.cli.put(`/chamados/${idTI}`, { status: 'fechado', solucao: 'Resolvido' })).status, 200,
-    'chamado em andamento continua podendo ser fechado pelo operador autorizado');
-  assert.equal((await manut.cli.post(`/chamados/${chamadoManut.data.id}/andamento`)).status, 200);
+    'chamado em atendimento continua podendo ser fechado pelo operador autorizado');
+  assert.equal((await manut.cli.post(`/chamados/${chamadoManut.data.id}/atendimento`)).status, 200);
   const chamadoAdmin = await comum.cli.post('/chamados', novoChamado('TI', 'Atendimento iniciado pelo admin'));
-  const iniciadoAdmin = await admin.cli.post(`/chamados/${chamadoAdmin.data.id}/andamento`);
+  const iniciadoAdmin = await admin.cli.post(`/chamados/${chamadoAdmin.data.id}/atendimento`);
   assert.equal(iniciadoAdmin.status, 200, JSON.stringify(iniciadoAdmin.data));
   assert.equal(iniciadoAdmin.data.atendente.id, admin.id);
 
   const cancelado = await comum.cli.post('/chamados', novoChamado('TI', 'Já cancelado'));
   assert.equal((await ti.cli.del(`/chamados/${cancelado.data.id}`, { motivo: 'duplicado' })).status, 200);
-  assert.equal((await ti.cli.post(`/chamados/${cancelado.data.id}/andamento`)).status, 409);
+  assert.equal((await ti.cli.post(`/chamados/${cancelado.data.id}/atendimento`)).status, 409);
 });
 
 test('cancelamento exige motivo, preserva histórico e apenas admin/setor correspondente pode cancelar', async () => {
@@ -204,15 +204,15 @@ test('edição parcial preserva campos opcionais e autor; autor e admin podem ed
   assert.equal((await autor.cli.put('/chamados/999999', { descricao: 'Não deve salvar' })).status, 404);
 });
 
-test('edição mantém a restrição para chamados em andamento, fechados e cancelados', async () => {
+test('edição mantém a restrição para chamados em atendimento, fechados e cancelados', async () => {
   const autor = await usuario('usuario');
-  const emAndamento = await autor.cli.post('/chamados', novoChamado('TI', 'Em andamento'));
+  const emAtendimento = await autor.cli.post('/chamados', novoChamado('TI', 'Em atendimento'));
   const fechado = await autor.cli.post('/chamados', novoChamado('Manutenção', 'Fechado'));
   const cancelado = await autor.cli.post('/chamados', novoChamado('TI', 'Cancelado'));
-  db.prepare("UPDATE chamados SET status='em_andamento' WHERE id=?").run(emAndamento.data.id);
+  db.prepare("UPDATE chamados SET status='em_atendimento' WHERE id=?").run(emAtendimento.data.id);
   db.prepare("UPDATE chamados SET status='fechado' WHERE id=?").run(fechado.data.id);
   db.prepare("UPDATE chamados SET cancelado_em='2026-01-01' WHERE id=?").run(cancelado.data.id);
-  for (const chamado of [emAndamento.data, fechado.data, cancelado.data]) {
+  for (const chamado of [emAtendimento.data, fechado.data, cancelado.data]) {
     assert.equal((await autor.cli.put(`/chamados/${chamado.id}`, { descricao: 'Não editar' })).status, 409);
   }
 });

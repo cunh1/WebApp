@@ -12,7 +12,7 @@
 2. **Filtros e paginação:** alterar pesquisa, setor, status ou datas retorna à primeira página; navegar entre páginas mantém os filtros ativos.
 3. **Cancelados:** corrigido o recarregamento ao sair do filtro de cancelados, evitando que chamados cancelados permaneçam na listagem depois de desmarcar sua exibição.
 4. **Busca de usuários:** respostas antigas de pesquisas anteriores não substituem resultados de uma busca mais recente quando as requisições terminam fora de ordem.
-5. **Anexos:** a interface agora aceita apenas PNG, JPG/JPEG, WEBP e GIF, limita cada arquivo a 5 MB e impede salvar enquanto a leitura de qualquer imagem estiver em andamento. A validação definitiva continua no backend.
+5. **Anexos:** a interface agora aceita apenas PNG, JPG/JPEG, WEBP e GIF, limita cada arquivo a 5 MB e impede salvar enquanto a leitura de qualquer imagem estiver em atendimento. A validação definitiva continua no backend.
 6. **Testes npm:** corrigido o script `test` para executar os arquivos `*.test.js` diretamente com Node.js 22.
 7. **Cache do navegador:** atualizadas as versões dos arquivos JS/CSS alterados para evitar que o navegador continue usando a versão antiga após o deploy.
 8. **Relatório anterior:** mantidas as correções já existentes para permissões de edição/exclusão do próprio chamado e gerenciamento de usuários.
@@ -43,9 +43,18 @@ A paginação adicionada nesta entrega é de interface: a rota atual ainda entre
 
 ## Atualização: iniciar atendimento
 
-- Adicionada a ação **Marcar como em andamento** na tela de detalhes dos chamados abertos.
+- Adicionada a ação **Marcar como em atendimento** na tela de detalhes dos chamados abertos.
 - A ação não abre formulário nem pede motivo: altera o status imediatamente.
 - A permissão é idêntica à de fechamento: administrador ou operador do setor correspondente (TI/Manutenção).
 - O operador que inicia o atendimento é gravado como atendente (`atendente_id`), e a data de atualização é registrada.
-- Chamados em andamento continuam podendo ser fechados ou cancelados conforme as regras existentes; a ação de iniciar desaparece após a transição.
+- Chamados em atendimento continuam podendo ser fechados ou cancelados conforme as regras existentes; a ação de iniciar desaparece após a transição.
 - Criado teste automatizado para permissões, atribuição de atendente, transição duplicada e chamado cancelado.
+
+## Padronização do status operacional — Em atendimento
+
+- A nomenclatura visível ao usuário foi alterada integralmente de **Em andamento** para **Em atendimento**.
+- O valor persistido no banco agora é `em_atendimento`; o endpoint passou a ser `POST /chamados/:id/atendimento`.
+- A função de repositório passou a se chamar `marcarEmAtendimento`, e os IDs/classes da interface foram renomeados para refletir o novo termo.
+- Criada a migração `007_status_em_atendimento.sql`, que converte registros antigos `em_andamento` para `em_atendimento`, preservando IDs, responsáveis, anexos, datas e histórico.
+- As migrações antigas não foram editadas, para preservar seus checksums e permitir que bancos já existentes no Render atualizem sem apagar dados.
+- A migração foi validada contra uma cópia do banco existente, incluindo conversão de um registro legado e verificação de chaves estrangeiras.

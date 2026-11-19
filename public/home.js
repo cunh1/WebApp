@@ -109,7 +109,7 @@ let chamadoDetalhadoId = null;
 let carregandoHash = false;
 
 function rotuloStatus(status) {
-    return ({ aberto: 'Aberto', em_andamento: 'Em andamento', fechado: 'Fechado', cancelado: 'Cancelado' })[status] || status || 'Não informado';
+    return ({ aberto: 'Aberto', em_atendimento: 'Em atendimento', fechado: 'Fechado', cancelado: 'Cancelado' })[status] || status || 'Não informado';
 }
 
 function dataCompleta(valor, incluirSegundos = false) {
@@ -202,7 +202,7 @@ function renderizarDetalhes(chamado) {
       ${!chamado.cancelado && (podeEditarChamado(chamado) || podeExcluirChamado(chamado) || (chamado.status !== 'fechado' && podeOperarSetor(chamado))) ? `<div class="detalhes-acoes">
         ${podeEditarChamado(chamado) ? `<button type="button" class="button" id="detalheAlterar">Alterar chamado</button>` : ''}
         ${podeExcluirChamado(chamado) ? `<button type="button" class="button botao-excluir" id="detalheExcluirDefinitivo">🗑 Excluir chamado</button>` : ''}
-        ${chamado.status !== 'fechado' && podeOperarSetor(chamado) ? `${chamado.status === 'aberto' ? `<button type="button" class="button botao-andamento" id="detalheAndamento">Marcar como em andamento</button>` : ''}<button type="button" class="button" id="detalheExcluir">Cancelar chamado</button><button type="button" class="button" id="detalheFechar">Fechar chamado</button>` : ''}
+        ${chamado.status !== 'fechado' && podeOperarSetor(chamado) ? `${chamado.status === 'aberto' ? `<button type="button" class="button botao-atendimento" id="detalheAtendimento">Marcar como em atendimento</button>` : ''}<button type="button" class="button" id="detalheExcluir">Cancelar chamado</button><button type="button" class="button" id="detalheFechar">Fechar chamado</button>` : ''}
       </div>` : ''}`;
 }
 
@@ -309,18 +309,18 @@ detalhesConteudo.addEventListener('click', async (evento) => {
         }
         return;
     }
-    if (botao.id === 'detalheAndamento') {
+    if (botao.id === 'detalheAtendimento') {
         const id = chamadoDetalhadoId;
         if (!id || botao.dataset.enviando === '1') return;
         botao.dataset.enviando = '1';
         botao.disabled = true;
         try {
-            const r = await fetch(`/chamados/${id}/andamento`, { method: 'POST', credentials: 'include' });
+            const r = await fetch(`/chamados/${id}/atendimento`, { method: 'POST', credentials: 'include' });
             const d = await r.json().catch(() => ({}));
             if (!r.ok) throw new Error(d.erro || 'Não foi possível iniciar o atendimento.');
             await carregarChamados();
             await abrirDetalhes(id, { atualizarUrl: false });
-            window.showToast(`Chamado #${id} marcado como em andamento. Atendimento atribuído a ${d.atendente?.nome || 'você'}.`, 'success');
+            window.showToast(`Chamado #${id} marcado como em atendimento. Atendimento atribuído a ${d.atendente?.nome || 'você'}.`, 'success');
         } catch (e) {
             botao.disabled = false;
             delete botao.dataset.enviando;

@@ -78,10 +78,10 @@ export function atualizarConteudo(id, { descricao, tipo, setorResponsavel, event
   return resultado.changes ? buscar(id) : undefined;
 }
 
-export function marcarEmAndamento(id, { usuarioId }) {
+export function marcarEmAtendimento(id, { usuarioId }) {
   const agora = new Date().toISOString().slice(0, 19).replace('T', ' ');
   const resultado = db.prepare(`UPDATE chamados
-    SET status='em_andamento', atendente_id=?, atualizado_em=?
+    SET status='em_atendimento', atendente_id=?, atualizado_em=?
     WHERE id=? AND status='aberto' AND cancelado_em IS NULL`)
     .run(usuarioId, agora, id);
   return resultado.changes ? buscar(id) : undefined;

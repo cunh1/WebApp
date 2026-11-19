@@ -478,7 +478,7 @@ header:has(#linkUsuarios) .profile-menu { margin-left: auto; }
 :root[data-theme="dark"] #imagem1,
 :root[data-theme="dark"] #imagem2 { background: #182336; border-color: #52627d; }
 :root[data-theme="dark"] .status-aberto { color: #c8d3ff; background: #2b395f; }
-:root[data-theme="dark"] .status-em_andamento { color: #ffda91; background: #493d27; }
+:root[data-theme="dark"] .status-em_atendimento { color: #ffda91; background: #493d27; }
 :root[data-theme="dark"] .status-fechado { color: #9ce2b9; background: #214133; }
 :root[data-theme="dark"] .status-cancelado { color: #ffb4aa; background: #482d30; border-color: #704348; }
 :root[data-theme="dark"] tr.chamado-cancelado td { color: #ffaaa0; }
@@ -694,7 +694,7 @@ body:has(.tela_inicial) {
 :root[data-theme="dark"] .filter-chip { color: #d2dcff; background: #2b3957; border-color: #485875; }
 :root[data-theme="dark"] .status-conta--ativa { background: #203d33; color: #8be0af; }
 :root[data-theme="dark"] .status-conta--inativa { background: #482d36; color: #ffb8bd; }
-:root[data-theme="dark"] #chamados td:nth-child(7).status-em_andamento { background: #443820; color: #f2ce7b; border-color: #6b5830; }
+:root[data-theme="dark"] #chamados td:nth-child(7).status-em_atendimento { background: #443820; color: #f2ce7b; border-color: #6b5830; }
 :root[data-theme="dark"] #chamados td:nth-child(7).status-fechado { background: #203d33; color: #8be0af; border-color: #37694f; }
 :root[data-theme="dark"] #chamados td:nth-child(7).status-cancelado { background: #482d36; color: #ffb8bd; border-color: #71414c; }
 @media (max-width: 760px) {
@@ -1125,7 +1125,7 @@ body:has(.tela_inicial) {
     white-space: nowrap;
   }
   #chamados td:nth-child(7)::before { content: none; }
-  #chamados td:nth-child(7).status-em_andamento { background: #fff1d6; color: #805400; border-color: #f0d69a; }
+  #chamados td:nth-child(7).status-em_atendimento { background: #fff1d6; color: #805400; border-color: #f0d69a; }
   #chamados td:nth-child(7).status-fechado { background: #dff5e8; color: #17643a; border-color: #b8e2c9; }
   #chamados td:nth-child(7).status-cancelado { background: #fbe9e7; color: #9f2d20; border-color: #efb4ad; }
   #chamados tbody tr:focus-visible { outline-offset: 2px; }
@@ -1323,5 +1323,5 @@ body:has(.tela_inicial) {
   }
 }
 
-:root[data-theme="dark"] .detalhes-acoes .botao-andamento { background: #263c5b; color: #c3d9ff; border-color: #3c5a83; box-shadow: none; }
-:root[data-theme="dark"] .detalhes-acoes .botao-andamento:hover { background: #304b70; }
+:root[data-theme="dark"] .detalhes-acoes .botao-atendimento { background: #263c5b; color: #c3d9ff; border-color: #3c5a83; box-shadow: none; }
+:root[data-theme="dark"] .detalhes-acoes .botao-atendimento:hover { background: #304b70; }

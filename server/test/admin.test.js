@@ -188,7 +188,7 @@ test('11b) admin exclui usuário e todos os chamados associados, preservando os 
   const insert = db.prepare('INSERT INTO chamados (usuario_id, descricao, tipo, status, cancelado_em, atendente_id) VALUES (?, ?, \'T.I\', ?, ?, ?)');
   const chamadosAlvo = [
     insert.run(idAutor, 'aberto', 'aberto', null, null).lastInsertRowid,
-    insert.run(idAutor, 'em andamento', 'em_andamento', null, null).lastInsertRowid,
+    insert.run(idAutor, 'em atendimento', 'em_atendimento', null, null).lastInsertRowid,
     insert.run(idAutor, 'encerrado', 'fechado', null, null).lastInsertRowid,
     insert.run(idAutor, 'cancelado', 'aberto', '2026-01-01', null).lastInsertRowid,
   ];

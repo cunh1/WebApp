@@ -117,12 +117,12 @@ router.put('/:id', carregarChamado, (req, res) => {
 });
 
 // Inicia o atendimento sem exigir motivo ou solução. A permissão é idêntica à de fechamento.
-router.post('/:id/andamento', carregarChamado, (req, res) => {
+router.post('/:id/atendimento', carregarChamado, (req, res) => {
   const atual = req.chamado;
   if (atual.cancelado) return res.status(409).json({ erro: 'Chamados cancelados não podem entrar em atendimento.' });
-  if (atual.status !== 'aberto') return res.status(409).json({ erro: 'Somente chamados abertos podem ser marcados como em andamento.' });
+  if (atual.status !== 'aberto') return res.status(409).json({ erro: 'Somente chamados abertos podem ser marcados como em atendimento.' });
   if (!podeOperarSetor(req, atual)) return res.status(403).json({ erro: 'Você não tem permissão para iniciar o atendimento deste setor.' });
-  const atualizado = chamados.marcarEmAndamento(atual.id, { usuarioId: req.usuario.id });
+  const atualizado = chamados.marcarEmAtendimento(atual.id, { usuarioId: req.usuario.id });
   if (!atualizado) return res.status(409).json({ erro: 'O chamado já foi alterado. Atualize a página e tente novamente.' });
   return res.json(atualizado);
 });

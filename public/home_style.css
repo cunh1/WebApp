@@ -352,7 +352,7 @@ footer {
     background: #e8edff;
     color: #354c9b;
 }
-.status-em_andamento { background: #fff1d6; color: #8b5b00; }
+.status-em_atendimento { background: #fff1d6; color: #8b5b00; }
 .status-fechado { background: #dff5e8; color: #17643a; }
 .detalhes-grade {
     display: grid;
@@ -557,5 +557,5 @@ tr.chamado-fechado td { color: #42664a; }
 }
 
 /* Ação de início de atendimento */
-.detalhes-acoes .botao-andamento { background: #e8f1ff; color: #234f91; border-color: #c8daf7; }
-.detalhes-acoes .botao-andamento:hover { background: #d9e8ff; }
+.detalhes-acoes .botao-atendimento { background: #e8f1ff; color: #234f91; border-color: #c8daf7; }
+.detalhes-acoes .botao-atendimento:hover { background: #d9e8ff; }
