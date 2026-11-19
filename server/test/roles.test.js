@@ -89,6 +89,38 @@ test('fechamento exige solução e só administrador ou setor correspondente pod
   assert.equal(adminClose.status,409,'não deve fechar novamente chamado já fechado');
 });
 
+test('iniciar atendimento é automático, atribui o atendente e usa as mesmas permissões do fechamento', async () => {
+  const admin = await usuario('admin');
+  const ti = await usuario('ti');
+  const manut = await usuario('manutencao');
+  const comum = await usuario('usuario');
+  const chamadoTI = await comum.cli.post('/chamados', novoChamado('TI', 'Atendimento TI'));
+  const chamadoManut = await comum.cli.post('/chamados', novoChamado('Manutenção', 'Atendimento manutenção'));
+  const idTI = chamadoTI.data.id;
+
+  assert.equal((await comum.cli.post(`/chamados/${idTI}/andamento`)).status, 403);
+  assert.equal((await manut.cli.post(`/chamados/${idTI}/andamento`)).status, 403);
+  const iniciado = await ti.cli.post(`/chamados/${idTI}/andamento`);
+  assert.equal(iniciado.status, 200, JSON.stringify(iniciado.data));
+  assert.equal(iniciado.data.status, 'em_andamento');
+  assert.equal(iniciado.data.atendente.id, ti.id);
+  assert.equal(iniciado.data.atendente.nome, ti.nome);
+  assert.ok(iniciado.data.atualizadoEm);
+  assert.equal((await ti.cli.post(`/chamados/${idTI}/andamento`)).status, 409, 'não permite iniciar duas vezes');
+  assert.equal((await comum.cli.get(`/chamados/${idTI}`)).data.status, 'em_andamento');
+  assert.equal((await ti.cli.put(`/chamados/${idTI}`, { status: 'fechado', solucao: 'Resolvido' })).status, 200,
+    'chamado em andamento continua podendo ser fechado pelo operador autorizado');
+  assert.equal((await manut.cli.post(`/chamados/${chamadoManut.data.id}/andamento`)).status, 200);
+  const chamadoAdmin = await comum.cli.post('/chamados', novoChamado('TI', 'Atendimento iniciado pelo admin'));
+  const iniciadoAdmin = await admin.cli.post(`/chamados/${chamadoAdmin.data.id}/andamento`);
+  assert.equal(iniciadoAdmin.status, 200, JSON.stringify(iniciadoAdmin.data));
+  assert.equal(iniciadoAdmin.data.atendente.id, admin.id);
+
+  const cancelado = await comum.cli.post('/chamados', novoChamado('TI', 'Já cancelado'));
+  assert.equal((await ti.cli.del(`/chamados/${cancelado.data.id}`, { motivo: 'duplicado' })).status, 200);
+  assert.equal((await ti.cli.post(`/chamados/${cancelado.data.id}/andamento`)).status, 409);
+});
+
 test('cancelamento exige motivo, preserva histórico e apenas admin/setor correspondente pode cancelar', async () => {
   const admin=await usuario('admin'), ti=await usuario('ti'), manut=await usuario('manutencao'), comum=await usuario('usuario');
   const ct=await comum.cli.post('/chamados',novoChamado('TI'));

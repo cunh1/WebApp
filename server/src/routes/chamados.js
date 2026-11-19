@@ -116,6 +116,17 @@ router.put('/:id', carregarChamado, (req, res) => {
   res.json(atualizado);
 });
 
+// Inicia o atendimento sem exigir motivo ou solução. A permissão é idêntica à de fechamento.
+router.post('/:id/andamento', carregarChamado, (req, res) => {
+  const atual = req.chamado;
+  if (atual.cancelado) return res.status(409).json({ erro: 'Chamados cancelados não podem entrar em atendimento.' });
+  if (atual.status !== 'aberto') return res.status(409).json({ erro: 'Somente chamados abertos podem ser marcados como em andamento.' });
+  if (!podeOperarSetor(req, atual)) return res.status(403).json({ erro: 'Você não tem permissão para iniciar o atendimento deste setor.' });
+  const atualizado = chamados.marcarEmAndamento(atual.id, { usuarioId: req.usuario.id });
+  if (!atualizado) return res.status(409).json({ erro: 'O chamado já foi alterado. Atualize a página e tente novamente.' });
+  return res.json(atualizado);
+});
+
 // Exclusão definitiva separada do DELETE legado, que continua significando cancelamento.
 router.delete('/:id/excluir', carregarChamado, (req, res) => {
   const atual = req.chamado;

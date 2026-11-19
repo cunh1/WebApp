@@ -1322,3 +1322,6 @@ body:has(.tela_inicial) {
     min-width: 150px;
   }
 }
+
+:root[data-theme="dark"] .detalhes-acoes .botao-andamento { background: #263c5b; color: #c3d9ff; border-color: #3c5a83; box-shadow: none; }
+:root[data-theme="dark"] .detalhes-acoes .botao-andamento:hover { background: #304b70; }

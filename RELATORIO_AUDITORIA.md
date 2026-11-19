@@ -39,3 +39,13 @@ A paginação adicionada nesta entrega é de interface: a rota atual ainda entre
 - Manter o banco SQLite e os arquivos de upload persistentes do ambiente atual.
 - Não apagar `server/webapp-seiren/app.sqlite` nem substituir o banco de produção pelo banco de teste do ZIP.
 - Depois de enviar os arquivos ao GitHub, fazer deploy e validar login, listagem, filtros, abrir/editar, fechar/cancelar, anexos e gerenciamento de usuários em desktop e celular.
+
+
+## Atualização: iniciar atendimento
+
+- Adicionada a ação **Marcar como em andamento** na tela de detalhes dos chamados abertos.
+- A ação não abre formulário nem pede motivo: altera o status imediatamente.
+- A permissão é idêntica à de fechamento: administrador ou operador do setor correspondente (TI/Manutenção).
+- O operador que inicia o atendimento é gravado como atendente (`atendente_id`), e a data de atualização é registrada.
+- Chamados em andamento continuam podendo ser fechados ou cancelados conforme as regras existentes; a ação de iniciar desaparece após a transição.
+- Criado teste automatizado para permissões, atribuição de atendente, transição duplicada e chamado cancelado.
