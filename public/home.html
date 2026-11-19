@@ -11,7 +11,7 @@
     <script src="toast.js" defer></script>
     <script src="theme.js" defer></script>
     <script src="profile-menu.js" defer></script>
-    <script src="home.js?v=20261119-atendimento1" defer></script>
+    <script src="home.js?v=20261119-filtro-status1" defer></script>
 </head>
 <body>
         <div id="container">
@@ -63,13 +63,13 @@
               </div>
               <div class="call-filters__grid">
                 <label class="call-filter call-filter--search"><span>Chamado ou usuário</span><input id="pesquisaChamados" type="search" placeholder="Número do chamado ou nome do usuário" autocomplete="off"></label>
-                <button type="button" class="call-filters__toggle" id="alternarFiltrosChamados" aria-expanded="false" aria-controls="filtrosAvancadosChamados">
+                <label class="call-filter call-filter--status"><span>Status</span><select id="filtroStatus"><option value="">Todos os status</option><option value="aberto">Aberto</option><option value="em_atendimento">Em atendimento</option><option value="fechado">Fechado</option><option value="cancelado">Cancelado</option></select></label>
+                <button type="button" class="call-filters__toggle" id="alternarFiltrosChamados" aria-label="Mais filtros (datas)" aria-expanded="false" aria-controls="filtrosAvancadosChamados">
                   <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M5 10h10m-7 5h4" /></svg>
                   <span>Filtros</span>
                   <svg class="call-filters__toggle-chevron" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 7 5 5 5-5" /></svg>
                 </button>
                 <div class="call-filters__advanced" id="filtrosAvancadosChamados">
-                <label class="call-filter"><span>Status</span><select id="filtroStatus"><option value="">Todos os status</option><option value="aberto">Aberto</option><option value="em_atendimento">Em atendimento</option><option value="fechado">Fechado</option><option value="cancelado">Cancelado</option></select></label>
                 <label class="call-filter"><span>Abertura a partir de</span><input id="filtroDataInicio" type="date"></label>
                 <label class="call-filter"><span>Abertura até</span><input id="filtroDataFim" type="date"></label>
                 </div>
@@ -126,7 +126,6 @@
           <footer class="item" id="acoesLista">
             <button type="button" class="button" id="incluir">Incluir</button>
             <button type="button" class="button" id="excluir" hidden>Excluir</button>
-            <button class="button" id="verCancelados" type="button">Ver cancelados</button>
           </footer>
         </div>
 

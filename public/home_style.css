@@ -483,7 +483,6 @@ footer {
 }
 
 .status-cancelado { background: #fbe9e7; color: #9f2d20; border-color: #efb4ad; }
-#verCancelados { min-width: max-content; }
 tr.chamado-cancelado { opacity: 0.78; }
 tr.chamado-cancelado td { color: #8f342a; }
 tr.chamado-fechado td { color: #42664a; }

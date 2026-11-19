@@ -69,10 +69,8 @@ const tabelaChamados = document.getElementById('chamados');
 const estadoVazioChamados = document.getElementById('estadoVazioChamados');
 let chamadoSelecionadoId = null;
 let filtroTipoAtual = null;
-let incluirCancelados = false;
 let chamadosCarregados = false;
 let chamadosDisponiveis = [];
-let cacheIncluiCancelados = false;
 const CHAMADOS_POR_PAGINA = 9;
 const MAXIMO_ABAS_VISIVEIS = 99;
 let paginaAtual = 1;
@@ -402,10 +400,8 @@ function selecionarLinha(id) {
 }
 
 async function carregarChamados() {
-    const params = new URLSearchParams();
-    const buscarCancelados = incluirCancelados || document.getElementById('filtroStatus').value === 'cancelado';
-    if (buscarCancelados) params.set('incluirCancelados', '1');
-    const url = `/chamados${params.toString() ? `?${params}` : ''}`;
+    // Sempre traz também os cancelados: o filtro de status (inclusive "Todos os status") decide o que aparece.
+    const url = '/chamados?incluirCancelados=1';
     if (!chamadosCarregados) {
         corpoTabela.innerHTML = Array.from({ length: 5 }, (_, linha) => `<tr aria-hidden="true">${Array.from({ length: 9 }, (__, coluna) => `<td><span class="skeleton skeleton-cell skeleton-cell--${(linha + coluna) % 3}"></span></td>`).join('')}</tr>`).join('');
         tabelaChamados.hidden = false;
@@ -419,7 +415,6 @@ async function carregarChamados() {
         const chamados = await resposta.json();
         chamadosCarregados = true;
         chamadosDisponiveis = chamados;
-        cacheIncluiCancelados = buscarCancelados;
         tabelaChamados.removeAttribute('aria-busy');
         chamadoSelecionadoId = null;
         aplicarFiltrosChamados();
@@ -518,7 +513,6 @@ function aplicarFiltrosChamados({ reiniciarPagina = true } = {}) {
     if (status) filtros.push(`Status: ${rotuloStatus(status)}`);
     if (inicio) filtros.push(`A partir de: ${inicio.split('-').reverse().join('/')}`);
     if (fim) filtros.push(`Até: ${fim.split('-').reverse().join('/')}`);
-    if (incluirCancelados) filtros.push('Cancelados incluídos');
     const ativo = filtros.length > 0;
     const limpar = document.getElementById('limparTodosFiltros');
     limpar.disabled = !ativo;
@@ -554,7 +548,6 @@ document.getElementById('proximaPagina').addEventListener('click', () => {
 
 function limparFiltrosChamados() {
     filtroTipoAtual = null;
-    incluirCancelados = false;
     document.getElementById('pesquisaChamados').value = '';
     document.getElementById('filtroStatus').value = '';
     document.getElementById('filtroDataInicio').value = '';
@@ -563,7 +556,6 @@ function limparFiltrosChamados() {
         document.getElementById(id).classList.remove('ativo');
         document.getElementById(id).setAttribute('aria-pressed', 'false');
     }
-    botaoCancelados.textContent = 'Ver cancelados';
 }
 
 // Menu lateral: filtra a lista por tipo (clicar de novo no mesmo item remove o filtro).
@@ -606,13 +598,6 @@ document.addEventListener('keydown', (evento) => {
 configurarFiltroMenu('Manutencao', 'Manutenção');
 configurarFiltroMenu('TI', 'T.I');
 
-const botaoCancelados = document.getElementById('verCancelados');
-if (botaoCancelados) botaoCancelados.addEventListener('click', async () => {
-    incluirCancelados = !incluirCancelados;
-    botaoCancelados.textContent = incluirCancelados ? 'Ocultar cancelados' : 'Ver cancelados';
-    await carregarChamados();
-});
-
 document.getElementById('criarChamadoVazio').addEventListener('click', () => {
     document.getElementById('incluir').click();
 });
@@ -635,11 +620,7 @@ alternarFiltrosChamados.addEventListener('click', () => {
     filtrosAvancadosChamados.classList.toggle('aberto', aberto);
 });
 for (const id of ['filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
-document.getElementById('filtroStatus').addEventListener('change', () => {
-    const precisaIncluirCancelados = incluirCancelados || document.getElementById('filtroStatus').value === 'cancelado';
-    if (precisaIncluirCancelados !== cacheIncluiCancelados) carregarChamados();
-    else aplicarFiltrosChamados();
-});
+document.getElementById('filtroStatus').addEventListener('change', () => aplicarFiltrosChamados());
 
 // ---------------------------------------------------------------------------------------
 // Overlay (modal) de confirmação: compartilhado pelos 3 botões do rodapé. No código

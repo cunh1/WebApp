@@ -76,8 +76,6 @@ article.item { padding: 14px; min-width: 0; background: #fff; }
 #chamados tbody tr.selecionada { background: #e8edfa; }
 #acoesLista { display: flex; align-items: center; gap: 9px; padding: 12px 16px; }
 #acoesLista .button { margin: 0; }
-#verCancelados { background: #eef1f7; color: #3b4962; box-shadow: none; }
-#verCancelados:hover { background: #e2e7f0; }
 #excluir, .detalhes-acoes .botao-excluir { background: #fff0f0; color: var(--danger); border-color: #f1d0d1; box-shadow: none; }
 #areaDetalhes { border-radius: 16px; }
 #overlay, #overlayForm { z-index: 1000; padding: 18px; background: rgba(16,24,42,.58); backdrop-filter: blur(3px); }
@@ -465,12 +463,10 @@ header:has(#linkUsuarios) .profile-menu { margin-left: auto; }
 :root[data-theme="dark"] .detalhe-cabecalho,
 :root[data-theme="dark"] .detalhe-lista > div { border-color: var(--line); }
 :root[data-theme="dark"] .botao-voltar,
-:root[data-theme="dark"] #verCancelados,
 :root[data-theme="dark"] #btnCancelar,
 :root[data-theme="dark"] #cancelar,
 :root[data-theme="dark"] .empty-state__secondary { color: #dbe3f4; background: #2b3850; border-color: #46556d; }
-:root[data-theme="dark"] .botao-voltar:hover,
-:root[data-theme="dark"] #verCancelados:hover { background: #35435d; }
+:root[data-theme="dark"] .botao-voltar:hover { background: #35435d; }
 :root[data-theme="dark"] .empty-state { border-color: #46546b; background: linear-gradient(145deg, #202c40, #1b2638); }
 :root[data-theme="dark"] .empty-state__icon { color: #b8c7ff; background: #2b3957; }
 :root[data-theme="dark"] .anexo-imagem { color: #b7c6ff; }
@@ -1325,3 +1321,16 @@ body:has(.tela_inicial) {
 
 :root[data-theme="dark"] .detalhes-acoes .botao-atendimento { background: #263c5b; color: #c3d9ff; border-color: #3c5a83; box-shadow: none; }
 :root[data-theme="dark"] .detalhes-acoes .botao-atendimento:hover { background: #304b70; }
+
+/* Filtro de status sempre visível; no celular fica compacto ao lado do botão de datas, sem rolagem horizontal. */
+@media (max-width: 560px) {
+  .call-filters__grid { grid-template-columns: minmax(0, 1fr) auto; align-items: end; }
+  .call-filter--search { grid-column: 1 / -1; }
+  .call-filter--status { grid-column: 1; }
+  .call-filters__toggle { grid-column: 2; width: auto; min-width: 44px; white-space: nowrap; }
+  .call-filters__advanced { grid-column: 1 / -1; }
+}
+@media (max-width: 380px) {
+  .call-filters__toggle > span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .call-filters__toggle .call-filters__toggle-chevron { margin-left: 0; }
+}
