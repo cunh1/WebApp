@@ -44,8 +44,10 @@ const tabela = document.getElementById('tabelaUsuarios');
 const carregando = document.getElementById('carregando');
 const listaVazia = document.getElementById('listaVazia');
 let usuariosCarregados = false;
+let sequenciaBuscaUsuarios = 0;
 
 async function carregarUsuarios() {
+    const sequenciaAtual = ++sequenciaBuscaUsuarios;
     const termo = document.getElementById('busca').value.trim();
     if (!usuariosCarregados) {
         tabela.classList.remove('com-registros');
@@ -61,6 +63,7 @@ async function carregarUsuarios() {
         if (!resposta.ok) throw new Error('Falha ao carregar usuários');
 
         const lista = await resposta.json();
+        if (sequenciaAtual !== sequenciaBuscaUsuarios) return;
         usuariosCarregados = true;
         carregando.style.display = 'none';
         if (!lista.length) {
@@ -81,6 +84,7 @@ async function carregarUsuarios() {
         corpoTabela.innerHTML = lista.map(desenharLinha).join('');
         tabela.classList.add('com-registros');
     } catch (erro) {
+        if (sequenciaAtual !== sequenciaBuscaUsuarios) return;
         if (!usuariosCarregados) carregando.style.display = 'none';
         mostrarMensagem(erro.message, 'erro');
     }
@@ -105,21 +109,17 @@ function desenharLinha(u) {
       <td><span class="selo ${cargo === 'admin' ? 'selo-admin' : 'selo-usuario'}">${escapar(nomes[cargo] || cargo)}</span></td>
       <td>${escapar(u.setor || (cargo === 'ti' ? 'TI' : cargo === 'manutencao' ? 'Manutenção' : '—'))}</td>
       <td><span class="status-conta ${u.ativo ? 'status-conta--ativa' : 'status-conta--inativa'}">${!u.ativo ? 'Desativado' : 'Ativo'}</span></td>
-      <td><details class="acoes-usuario">
-        <summary aria-label="Abrir aÃ§Ãµes para ${escapar(u.nome)}"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="4" cy="10" r="1.4"/><circle cx="10" cy="10" r="1.4"/><circle cx="16" cy="10" r="1.4"/></svg></summary>
-        <div class="acoes-usuario__menu">
+      <td><div class="acoes-usuario">
         <button type="button" class="btn-editar" data-acao="editar" data-id="${u.id}">Editar</button>
         <button type="button" class="btn-promover" data-acao="${!u.ativo ? 'ativar' : 'desativar'}" data-id="${u.id}" data-nome="${escapar(u.nome)}" ${ehEuMesmo ? 'disabled title="Você não pode desativar a própria conta"' : ''}>${!u.ativo ? 'Ativar' : 'Desativar'}</button>
         <button type="button" class="btn-excluir" data-acao="excluir" data-id="${u.id}" data-nome="${escapar(u.nome)}" ${ehEuMesmo ? 'disabled title="Você não pode excluir a própria conta"' : ''}>Excluir</button>
-        </div>
-      </details></td></tr>`;
+      </div></td></tr>`;
 }
 
 corpoTabela.addEventListener('click', (evento) => {
     const botao = evento.target.closest('button[data-acao]');
     if (!botao || botao.disabled) return;
     const id = Number(botao.dataset.id);
-    botao.closest('details')?.removeAttribute('open');
     if (botao.dataset.acao === 'editar') window.abrirEdicao(id);
     else window.confirmarAcao(botao.dataset.acao, id, botao.dataset.nome);
 });

@@ -73,6 +73,10 @@ let incluirCancelados = false;
 let chamadosCarregados = false;
 let chamadosDisponiveis = [];
 let cacheIncluiCancelados = false;
+const CHAMADOS_POR_PAGINA = 9;
+const MAXIMO_ABAS_VISIVEIS = 99;
+let paginaAtual = 1;
+let chamadosFiltrados = [];
 
 function formatarData(isoComoTexto, incluirSegundos = false) {
     if (!isoComoTexto) return { data: '—', hora: '—' };
@@ -122,14 +126,16 @@ function podeOperarSetor(chamado) {
     return false;
 }
 function podeEditarChamado(chamado) {
+    // O autor pode editar o próprio chamado aberto, independentemente do cargo.
+    // Administradores também podem editar chamados abertos de terceiros.
     return Boolean(usuarioAtual && !chamado.cancelado && chamado.status === 'aberto' &&
-        (usuarioAtual.papel === 'admin' || (['ti', 'manutencao'].includes(usuarioAtual.papel) && chamado.usuario?.id === usuarioAtual.id)));
+        (usuarioAtual.papel === 'admin' || chamado.usuario?.id === usuarioAtual.id));
 }
 
 function podeExcluirChamado(chamado) {
-    // Usuários sem setor podem abrir chamados, mas ações de manutenção exigem perfil setorial/admin.
+    // A exclusão definitiva é exclusiva do autor, inclusive para usuários comuns.
     return Boolean(usuarioAtual && !chamado.cancelado && chamado.status === 'aberto' &&
-        ['admin', 'ti', 'manutencao'].includes(usuarioAtual.papel) && chamado.usuario?.id === usuarioAtual.id);
+        chamado.usuario?.id === usuarioAtual.id);
 }
 
 function renderizarDetalhes(chamado) {
@@ -423,8 +429,48 @@ function dataLocalChamado(valor) {
     return `${mapa.year}-${mapa.month}-${mapa.day}`;
 }
 
-function aplicarFiltrosChamados() {
+function renderizarPaginacao(totalPaginas) {
+    const navegacao = document.getElementById('paginacaoChamados');
+    const numeros = document.getElementById('numerosPaginas');
+    const anterior = document.getElementById('paginaAnterior');
+    const proxima = document.getElementById('proximaPagina');
+    const resumo = document.getElementById('resumoPaginacao');
+
+    navegacao.hidden = totalPaginas === 0;
+    if (!totalPaginas) {
+        numeros.replaceChildren();
+        resumo.textContent = '';
+        return;
+    }
+
+    // No máximo 99 números ficam visíveis por vez. Em listas enormes, os botões
+    // anterior/próximo percorrem os blocos seguintes sem impor limite ao total de páginas.
+    const inicioBloco = Math.floor((paginaAtual - 1) / MAXIMO_ABAS_VISIVEIS) * MAXIMO_ABAS_VISIVEIS + 1;
+    const fimBloco = Math.min(totalPaginas, inicioBloco + MAXIMO_ABAS_VISIVEIS - 1);
+    const botoes = [];
+    for (let pagina = inicioBloco; pagina <= fimBloco; pagina++) {
+        const botao = document.createElement('button');
+        botao.type = 'button';
+        botao.className = 'pagination__page';
+        botao.textContent = String(pagina);
+        botao.setAttribute('aria-label', `Página ${pagina}`);
+        if (pagina === paginaAtual) botao.setAttribute('aria-current', 'page');
+        botao.classList.toggle('ativa', pagina === paginaAtual);
+        botao.addEventListener('click', () => {
+            paginaAtual = pagina;
+            aplicarFiltrosChamados({ reiniciarPagina: false });
+        });
+        botoes.push(botao);
+    }
+    numeros.replaceChildren(...botoes);
+    anterior.disabled = inicioBloco === 1;
+    proxima.disabled = fimBloco >= totalPaginas;
+    resumo.textContent = `${paginaAtual} / ${totalPaginas}`;
+}
+
+function aplicarFiltrosChamados({ reiniciarPagina = true } = {}) {
     if (!chamadosCarregados) return;
+    if (reiniciarPagina) paginaAtual = 1;
     const pesquisa = normalizarPesquisa(document.getElementById('pesquisaChamados').value);
     const status = document.getElementById('filtroStatus').value;
     const inicio = document.getElementById('filtroDataInicio').value;
@@ -439,7 +485,14 @@ function aplicarFiltrosChamados() {
         return textoPesquisa && correspondeSetor && (!status || chamado.status === status) &&
             (!inicio || (data && data >= inicio)) && (!fim || (data && data <= fim));
     });
-    corpoTabela.replaceChildren(...chamados.map(desenharLinha));
+    chamadosFiltrados = chamados;
+    const totalPaginas = Math.ceil(chamados.length / CHAMADOS_POR_PAGINA);
+    paginaAtual = Math.min(Math.max(1, paginaAtual), Math.max(1, totalPaginas));
+    const primeiroIndice = (paginaAtual - 1) * CHAMADOS_POR_PAGINA;
+    const chamadosDaPagina = chamados.slice(primeiroIndice, primeiroIndice + CHAMADOS_POR_PAGINA);
+    corpoTabela.replaceChildren(...chamadosDaPagina.map(desenharLinha));
+    renderizarPaginacao(totalPaginas);
+
     const filtros = [];
     if (pesquisa) filtros.push(`Pesquisa: ${document.getElementById('pesquisaChamados').value.trim()}`);
     if (setor) filtros.push(`Setor: ${filtroTipoAtual}`);
@@ -468,6 +521,17 @@ function aplicarFiltrosChamados() {
         document.getElementById('limparFiltrosChamados').hidden = !ativo;
     }
 }
+
+// Avança ou retorna um bloco de até 99 abas, mantendo a página atual dentro do novo bloco.
+document.getElementById('paginaAnterior').addEventListener('click', () => {
+    paginaAtual = Math.max(1, Math.floor((paginaAtual - 1) / MAXIMO_ABAS_VISIVEIS) * MAXIMO_ABAS_VISIVEIS);
+    aplicarFiltrosChamados({ reiniciarPagina: false });
+});
+document.getElementById('proximaPagina').addEventListener('click', () => {
+    const totalPaginas = Math.ceil(chamadosFiltrados.length / CHAMADOS_POR_PAGINA);
+    paginaAtual = Math.min(totalPaginas, Math.floor((paginaAtual - 1) / MAXIMO_ABAS_VISIVEIS) * MAXIMO_ABAS_VISIVEIS + MAXIMO_ABAS_VISIVEIS + 1);
+    aplicarFiltrosChamados({ reiniciarPagina: false });
+});
 
 function limparFiltrosChamados() {
     filtroTipoAtual = null;
@@ -553,7 +617,8 @@ alternarFiltrosChamados.addEventListener('click', () => {
 });
 for (const id of ['filtroDataInicio', 'filtroDataFim']) document.getElementById(id).addEventListener('change', aplicarFiltrosChamados);
 document.getElementById('filtroStatus').addEventListener('change', () => {
-    if (document.getElementById('filtroStatus').value === 'cancelado' && !cacheIncluiCancelados) carregarChamados();
+    const precisaIncluirCancelados = incluirCancelados || document.getElementById('filtroStatus').value === 'cancelado';
+    if (precisaIncluirCancelados !== cacheIncluiCancelados) carregarChamados();
     else aplicarFiltrosChamados();
 });
 

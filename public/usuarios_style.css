@@ -127,6 +127,9 @@ main {
     font-size: 0.9rem;
 }
 
+/* A listagem só fica visível depois que os registros são carregados pelo JS. */
+#tabelaUsuarios.com-registros { display: table; }
+
 #tabelaUsuarios th {
     background: #2b3f9f;
     color: #fff;
@@ -154,7 +157,7 @@ main {
 .selo-admin { background: #eef1fd; color: #23459f; }
 .selo-usuario { background: #f1f2f4; color: #555; }
 
-.acoes-usuario { display: flex; gap: 6px; flex-wrap: wrap; }
+.acoes-usuario { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 170px; }
 .acoes-usuario button {
     border: none;
     border-radius: 20px;

@@ -2,8 +2,14 @@ let modoAlteracao = false;
 let chamadoIdAtual = null;
 let imagem1Alterada = false;
 let imagem2Alterada = false;
+let formularioPronto = false;
+let leiturasPendentes = 0;
 const botaoSalvar = document.getElementById('salvar');
 botaoSalvar.disabled = true;
+
+function atualizarEstadoBotaoSalvar() {
+    botaoSalvar.disabled = !formularioPronto || leiturasPendentes > 0;
+}
 
 window.addEventListener('load', async () => {
     let usuario;
@@ -80,7 +86,8 @@ window.addEventListener('load', async () => {
         }
         modoAlteracao = false;
     }
-    botaoSalvar.disabled = false;
+    formularioPronto = true;
+    atualizarEstadoBotaoSalvar();
 });
 
 function limparEstadoEdicao() {
@@ -95,23 +102,32 @@ function configurarImagem(inputId, imagemId, marcarAlterada) {
     document.getElementById(inputId).addEventListener('change', function() {
         const arquivo = this.files?.[0];
         if (!arquivo) return;
-        if (!arquivo.type.startsWith('image/')) {
-            window.showToast('Selecione um arquivo de imagem válido.', 'warning');
+        const tiposPermitidos = ['image/png', 'image/jpeg', 'image/webp', 'image/gif'];
+        if (!tiposPermitidos.includes(arquivo.type)) {
+            window.showToast('Formato não permitido. Use PNG, JPG, WEBP ou GIF.', 'warning');
             this.value = '';
             return;
         }
-        botaoSalvar.disabled = true;
+        if (arquivo.size > 5 * 1024 * 1024) {
+            window.showToast('Cada imagem pode ter no máximo 5 MB.', 'warning');
+            this.value = '';
+            return;
+        }
+        leiturasPendentes++;
+        atualizarEstadoBotaoSalvar();
         const leitor = new FileReader();
         leitor.onload = (evento) => {
             const imagem = document.getElementById(imagemId);
             imagem.src = evento.target.result;
             imagem.hidden = false;
             marcarAlterada();
-            botaoSalvar.disabled = false;
+            leiturasPendentes = Math.max(0, leiturasPendentes - 1);
+            atualizarEstadoBotaoSalvar();
         };
         leitor.onerror = () => {
             window.showToast('Não foi possível carregar a imagem selecionada.', 'error');
-            botaoSalvar.disabled = false;
+            leiturasPendentes = Math.max(0, leiturasPendentes - 1);
+            atualizarEstadoBotaoSalvar();
         };
         leitor.readAsDataURL(arquivo);
     });
@@ -148,6 +164,8 @@ botaoSalvar.addEventListener('click', async () => {
     if (!modoAlteracao || imagem1Alterada) dados.imagem1 = imagem1Alterada ? document.getElementById('imagem1').src : null;
     if (!modoAlteracao || imagem2Alterada) dados.imagem2 = imagem2Alterada ? document.getElementById('imagem2').src : null;
 
+    atualizarEstadoBotaoSalvar();
+    if (botaoSalvar.disabled) return;
     botaoSalvar.disabled = true;
     try {
         const resposta = await fetch(modoAlteracao ? `/chamados/${chamadoIdAtual}` : '/chamados', {
@@ -167,6 +185,6 @@ botaoSalvar.addEventListener('click', async () => {
         window.showToast(`Erro ao salvar: ${erro.message}`, 'error');
         console.error(erro);
     } finally {
-        botaoSalvar.disabled = false;
+        atualizarEstadoBotaoSalvar();
     }
 });

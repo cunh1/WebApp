@@ -30,3 +30,13 @@ O backend utiliza `better-sqlite3` síncrono e arquivos locais para banco e anex
 - Chamados fechados ou cancelados continuam protegidos contra exclusão definitiva.
 - Foram atualizados os testes automatizados para cobrir administrador, TI, Manutenção e usuário comum.
 - Validação executada: `node --check` nos arquivos JavaScript alterados passou. `npm test` não pôde executar porque `better-sqlite3` não está instalado neste ambiente de análise; os testes precisam ser executados no ambiente local com as dependências instaladas.
+
+
+## Correções adicionais — permissões mobile e tabela administrativa
+
+- Usuários comuns agora podem editar seus próprios chamados enquanto estiverem abertos; continuam sem poder editar chamados de terceiros.
+- Usuários comuns agora podem excluir definitivamente seus próprios chamados abertos; a API continua validando o autor pela sessão e pelo registro persistido.
+- A tela de chamados passou a exibir as ações de editar/excluir para o autor independentemente do cargo.
+- A tabela de usuários no desktop estava permanentemente oculta por `display: none` sem uma regra de exibição para o estado `com-registros`; foi adicionada a regra para torná-la visível após o carregamento.
+- As ações Editar/Ativar/Desativar/Excluir foram mantidas visíveis diretamente na coluna Ações, evitando depender de um menu recolhível.
+- O `package.json` da raiz agora inicia o servidor em `server/src/server.js`, compatível com a estrutura deste repositório quando a raiz do repositório é usada como Root Directory no Render.

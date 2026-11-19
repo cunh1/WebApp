@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script>try{const t=localStorage.getItem('webapp.theme');if(t==='dark'||t==='light')document.documentElement.dataset.theme=t;}catch{}</script>
     <title>WebApp_Seiren</title>
-    <link rel="stylesheet" href="home_style.css">
+    <link rel="stylesheet" href="home_style.css?v=20261119-audit1">
     <link rel="stylesheet" href="frontend-modern.css">
     <link rel="stylesheet" href="desktop-refinement.css">
     <script src="toast.js" defer></script>
     <script src="theme.js" defer></script>
     <script src="profile-menu.js" defer></script>
-    <script src="home.js?v=20261104-stability-1" defer></script>
+    <script src="home.js?v=20261119-audit1" defer></script>
 </head>
 <body>
         <div id="container">
@@ -94,6 +94,12 @@
                 <!--Itens-->
               </tbody>
             </table>
+            <nav id="paginacaoChamados" class="pagination" aria-label="Páginas de chamados" hidden>
+              <button type="button" class="pagination__nav" id="paginaAnterior" aria-label="Páginas anteriores" disabled>‹</button>
+              <div class="pagination__numbers" id="numerosPaginas"></div>
+              <button type="button" class="pagination__nav" id="proximaPagina" aria-label="Próximas páginas" disabled>›</button>
+              <span class="pagination__summary" id="resumoPaginacao"></span>
+            </nav>
             <section id="estadoVazioChamados" class="empty-state" role="status" aria-live="polite" hidden>
               <span class="empty-state__icon" aria-hidden="true">
                 <svg viewBox="0 0 48 48" focusable="false"><path d="M8 10h32v28H8zM8 17h32M18 17v4m12-4v4M16 27h16M16 33h10" /></svg>

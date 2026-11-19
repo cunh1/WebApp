@@ -502,3 +502,56 @@ tr.chamado-fechado td { color: #42664a; }
 }
 .acao-excluir-lista:hover { background: #ffe2e2; }
 .acao-excluir-lista:disabled { opacity: .55; cursor: wait; }
+
+
+/* Paginação da lista de chamados: até 9 registros por página e até 99 abas visíveis. */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+  margin: 18px 0 8px;
+  padding: 12px;
+}
+.pagination[hidden] { display: none !important; }
+.pagination__numbers {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: min(100%, 900px);
+}
+.pagination__page, .pagination__nav {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 6px 10px;
+  border: 1px solid var(--line, #d6dce5);
+  border-radius: 9px;
+  background: var(--paper, #fff);
+  color: var(--ink, #263244);
+  font: inherit;
+  cursor: pointer;
+}
+.pagination__page:hover:not(.ativa), .pagination__nav:hover:not(:disabled) {
+  border-color: var(--brand, #2674d9);
+}
+.pagination__page.ativa {
+  background: var(--brand, #2674d9);
+  border-color: var(--brand, #2674d9);
+  color: #fff;
+  font-weight: 700;
+}
+.pagination__nav:disabled { opacity: .4; cursor: not-allowed; }
+.pagination__summary {
+  flex-basis: 100%;
+  color: var(--muted, #687386);
+  text-align: center;
+  font-size: .82rem;
+}
+@media (max-width: 600px) {
+  .pagination { gap: 5px; padding: 10px 2px; }
+  .pagination__numbers { gap: 4px; }
+  .pagination__page, .pagination__nav { min-width: 32px; min-height: 34px; padding: 5px 7px; }
+}

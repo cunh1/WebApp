@@ -55,13 +55,13 @@ test('todos os cargos podem criar chamados para qualquer setor e visualizar ambo
   }
 });
 
-test('usuário sem setor só abre chamados; operadores e admins mantêm os fluxos de edição', async () => {
+test('usuário comum pode editar o próprio chamado aberto, mas não chamados de terceiros', async () => {
   const admin=await usuario('admin'), autor=await usuario('usuario'), outro=await usuario('usuario'), ti=await usuario('ti');
   const criado=await autor.cli.post('/chamados',novoChamado('TI'));
   assert.equal(criado.status,201);
   assert.equal((await outro.cli.put(`/chamados/${criado.data.id}`,{descricao:'invasão'})).status,403);
   assert.equal((await ti.cli.put(`/chamados/${criado.data.id}`,{descricao:'edição operacional'})).status,403);
-  assert.equal((await autor.cli.put(`/chamados/${criado.data.id}`,{descricao:'minha edição'})).status,403);
+  assert.equal((await autor.cli.put(`/chamados/${criado.data.id}`,{descricao:'minha edição'})).status,200);
   assert.equal((await admin.cli.put(`/chamados/${criado.data.id}`,{descricao:'edição admin'})).status,200);
   const fechado=await ti.cli.put(`/chamados/${criado.data.id}`,{status:'fechado',solucao:'Ajuste realizado'});
   assert.equal(fechado.status,200);
@@ -244,6 +244,18 @@ test('exclusão definitiva: somente o autor pode excluir, independentemente do c
   assert.equal((await autor.cli.del('/chamados/999999/excluir')).status, 404);
 });
 
+
+test('usuário comum pode excluir definitivamente o próprio chamado aberto, mas não o de terceiros', async () => {
+  const autor = await usuario('usuario');
+  const outro = await usuario('usuario');
+  const criado = await autor.cli.post('/chamados', novoChamado('TI', 'Chamado comum para excluir'));
+  assert.equal(criado.status, 201);
+  const id = criado.data.id;
+
+  assert.equal((await outro.cli.del(`/chamados/${id}/excluir`)).status, 403);
+  assert.equal((await autor.cli.del(`/chamados/${id}/excluir`)).status, 204);
+  assert.equal((await autor.cli.get(`/chamados/${id}`)).status, 404);
+});
 
 test('exclusão definitiva: TI e Manutenção podem excluir os próprios chamados, mas não os de terceiros', async () => {
   const ti = await usuario('ti');
